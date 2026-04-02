@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anderson Pessoa — Sistemas Complexos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0d0d0b;
+  --bg2:     #141412;
+  --bg3:     #1c1c19;
+  --t1:      #ccc8b8;
+  --t2:      #8a8478;
+  --t3:      #524e46;
+  --border:  rgba(200,190,160,0.09);
+  --border2: rgba(200,190,160,0.18);
+  --amber:   #c8963c;
+  --amber2:  #e8b860;
+  --teal:    #3da898;
+  --blue:    #5b8fd4;
+  --purple:  #9b6cd4;
+  --rose:    #c87070;
+  --green:   #6cb898;
+  --mono: 'IBM Plex Mono', 'Cascadia Code', monospace;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2.5rem;
+  background: rgba(13,13,11,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 0.5px solid var(--border);
+}
+.nav-logo {
+  font-size: 12px;
+  color: var(--amber);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+}
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-size: 11px;
+  color: var(--t3);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--t1); }
+
+/* ── HERO ── */
+#hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#net {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-tag {
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+.hero-name {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 500;
+  color: var(--t1);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.5s forwards;
+}
+.hero-sub {
+  font-size: 12px;
+  color: var(--t2);
+  letter-spacing: 0.06em;
+  line-height: 2;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.7s forwards;
+}
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.9s forwards;
+}
+.hero-cta a {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--t2);
+  text-decoration: none;
+  border: 0.5px solid var(--border2);
+  padding: 7px 18px;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  transition: color 0.2s, border-color 0.2s;
+  pointer-events: all;
+}
+.hero-cta a:hover { color: var(--amber); border-color: var(--amber); }
+.hero-cta a.primary {
+  background: var(--amber);
+  color: var(--bg);
+  border-color: var(--amber);
+}
+.hero-cta a.primary:hover { background: var(--amber2); border-color: var(--amber2); color: var(--bg); }
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: 0.2em;
+  animation: bob 2.4s ease-in-out infinite;
+  z-index: 2;
+}
+.hint-line {
+  width: 0.5px;
+  height: 36px;
+  background: var(--t3);
+  margin: 6px auto 0;
+  animation: grow 2.4s ease-in-out infinite;
+  transform-origin: top;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bob {
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(5px)}
+}
+@keyframes grow {
+  0%,100%{transform:scaleY(0.4); opacity:0.3}
+  50%{transform:scaleY(1); opacity:1}
+}
+
+/* ── LAYOUT ── */
+.section-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 7rem 2.5rem;
+}
+.full-section { padding: 7rem 0; }
+.full-section .section-header {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 2.5rem 3rem;
+}
+
+.s-label {
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.s-title {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 500;
+  color: var(--t1);
+  line-height: 1.15;
+}
+.s-title em { font-style: italic; color: var(--amber); }
+
+/* ── DIVIDER ── */
+.hr {
+  border: none;
+  border-top: 0.5px solid var(--border);
+  margin: 0;
+}
+
+/* ── SOBRE ── */
+.sobre-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-top: 3rem;
+}
+.sobre-text {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--t1);
+  line-height: 1.85;
+  font-weight: 300;
+}
+.sobre-text em { color: var(--amber); font-style: normal; font-family: var(--mono); font-size: 13px; }
+.sobre-stats { display: flex; flex-direction: column; gap: 1.5rem; padding-top: 0.25rem; }
+.stat { border-left: 2px solid var(--border2); padding-left: 1.25rem; }
+.stat-val { font-size: 1.6rem; font-weight: 500; color: var(--amber); line-height: 1.1; }
+.stat-lbl { font-size: 11px; color: var(--t3); letter-spacing: 0.06em; margin-top: 2px; }
+
+/* ── DOMAINS ── */
+.domains-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 0.5px solid var(--border);
+  border-left: 0.5px solid var(--border);
+}
+.domain-card {
+  background: var(--bg);
+  padding: 2rem 1.75rem;
+  border-right: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  transition: background 0.25s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.domain-card:hover { background: var(--bg2); }
+.domain-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--c, var(--amber));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+.domain-card:hover::after { transform: scaleX(1); }
+.d-icon { width: 32px; height: 32px; margin-bottom: 1.25rem; }
+.d-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--t1);
+  margin-bottom: 0.2rem;
+}
+.d-angle {
+  font-size: 10px;
+  color: var(--c, var(--amber));
+  letter-spacing: 0.06em;
+  margin-bottom: 0.85rem;
+  font-style: italic;
+}
+.d-desc {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+  font-family: var(--sans);
+  font-weight: 300;
+}
+.d-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.tag {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--t3);
+  border: 0.5px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 1px;
+}
+
+/* ── PROJECTS ── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 0.5px solid var(--border);
+  border-left: 0.5px solid var(--border);
+  margin-top: 3rem;
+}
+.project-card {
+  background: var(--bg);
+  padding: 2rem 1.75rem;
+  border-right: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  transition: background 0.2s;
+}
+.project-card:hover { background: var(--bg2); }
+.p-repo {
+  font-size: 12px;
+  color: var(--amber);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.p-repo::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+.p-desc {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+  font-family: var(--sans);
+  font-weight: 300;
+}
+.p-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+
+/* ── STACK ── */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 0.5px solid var(--border);
+  border-left: 0.5px solid var(--border);
+  margin-top: 3rem;
+}
+.stack-group {
+  padding: 1.75rem;
+  border-right: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+}
+.sg-label {
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.sg-items { list-style: none; }
+.sg-items li {
+  font-size: 11px;
+  color: var(--t2);
+  padding: 4px 0;
+  border-bottom: 0.5px solid var(--border);
+  letter-spacing: 0.02em;
+}
+.sg-items li:last-child { border-bottom: none; }
+.sg-items li::before { content: '— '; color: var(--t3); }
+
+/* ── READING ── */
+.reading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  margin-top: 3rem;
+}
+.r-cat h3 {
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 0.5px solid var(--border2);
+}
+.book {
+  padding: 0.6rem 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.book-author { font-size: 12px; color: var(--t1); }
+.book-note { font-size: 11px; color: var(--t3); margin-top: 1px; font-style: italic; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 0.5px solid var(--border);
+  padding: 2rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--t3);
+  max-width: none;
+}
+footer a { color: var(--t2); text-decoration: none; transition: color 0.2s; }
+footer a:hover { color: var(--amber); }
+.footer-links { display: flex; gap: 2rem; }
+
+/* ── FADE IN ── */
+.fade { opacity: 0; transform: translateY(18px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.fade.in { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.25rem; }
+  .nav-links { gap: 1.2rem; }
+  .section-wrap { padding: 5rem 1.25rem; }
+  .full-section .section-header { padding: 0 1.25rem 2.5rem; }
+  .sobre-body { grid-template-columns: 1fr; gap: 2.5rem; }
+  .domains-grid { grid-template-columns: 1fr 1fr; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .stack-grid { grid-template-columns: 1fr 1fr; }
+  .reading-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .domains-grid { grid-template-columns: 1fr; }
+  .hero-name { letter-spacing: -0.01em; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">anderkolm.github.io</a>
+  <ul class="nav-links">
+    <li><a href="#sobre">sobre</a></li>
+    <li><a href="#dominios">domínios</a></li>
+    <li><a href="#projetos">projetos</a></li>
+    <li><a href="#leitura">leitura</a></li>
+    <li><a href="https://github.com/anderkolm" target="_blank">github ↗</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="net"></canvas>
+  <div class="hero-overlay">
+    <p class="hero-tag">Engenharia de Sistemas Complexos</p>
+    <h1 class="hero-name">Anderson Pessoa</h1>
+    <p class="hero-sub">
+      Confiabilidade · Controle · Flow Assurance · IIoT<br>
+      Eng. Mecânica · UFRJ · Brasil
+    </p>
+    <div class="hero-cta">
+      <a href="#dominios" class="primary">explorar domínios</a>
+      <a href="https://github.com/anderkolm" target="_blank">github ↗</a>
+    </div>
+  </div>
+  <div class="scroll-hint">↓<div class="hint-line"></div></div>
+</section>
+
+<hr class="hr">
+
+<!-- SOBRE -->
+<div class="section-wrap fade" id="sobre">
+  <p class="s-label">// sobre</p>
+  <h2 class="s-title">Sistemas que falham,<br>oscilam, <em>emergem</em>.</h2>
+  <div class="sobre-body">
+    <p class="sobre-text">
+      Graduando em Engenharia Mecânica na UFRJ. O fio condutor: entender como estruturas industriais —
+      máquinas, redes de processo, pipelines — se comportam como sistemas dinâmicos não-lineares.
+      <br><br>
+      Usar esse entendimento para construir diagnósticos, controladores e monitoramentos mais robustos.
+      Portfolio como experimento: <em>repositórios concisos</em>, código + gráficos, setups reproduzíveis.
+      Preferência por embarcar experimentos a escrever documentação longa.
+    </p>
+    <div class="sobre-stats">
+      <div class="stat">
+        <div class="stat-val">4</div>
+        <div class="stat-lbl">repositórios em construção</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">6</div>
+        <div class="stat-lbl">domínios interconectados</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">1</div>
+        <div class="stat-lbl">sistema subjacente a todos</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="hr">
+
+<!-- DOMINIOS -->
+<div class="full-section fade" id="dominios">
+  <div class="section-header">
+    <p class="s-label">// domínios</p>
+    <h2 class="s-title">Seis ângulos,<br>um sistema subjacente.</h2>
+  </div>
+  <div class="domains-grid">
+
+    <div class="domain-card" style="--c: #c8963c">
+      <svg class="d-icon" viewBox="0 0 32 32" fill="none">
+        <path d="M2 26 Q7 24 10 18 Q13 12 17 14 Q21 16 23 9 Q25 5 28 7" stroke="#c8963c" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="28" cy="7" r="2" fill="#c8963c" opacity="0.9"/>
+        <line x1="2" y1="28" x2="30" y2="28" stroke="#524e46" stroke-width="0.5"/>
+        <line x1="2" y1="28" x2="2" y2="4" stroke="#524e46" stroke-width="0.5"/>
+      </svg>
+      <p class="d-name">PHM · RUL</p>
+      <p class="d-angle">prognóstico como trajetória no espaço de fases</p>
+      <p class="d-desc">
+        Sistemas que envelhecem não-linearmente. Feature extraction para saúde de máquinas,
+        estimativa de vida útil remanescente e alertas baseados em sinais claros e limiares
+        interpretáveis — sem caixas-pretas.
+      </p>
+      <div class="d-tags">
+        <span class="tag">RCM</span><span class="tag">FMEA</span><span class="tag">Bow-Tie</span>
+        <span class="tag">RAM</span><span class="tag">LCC</span><span class="tag">filterpy</span>
+      </div>
+    </div>
+
+    <div class="domain-card" style="--c: #3da898">
+      <svg class="d-icon" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="11" stroke="#3a4a48" stroke-width="0.5"/>
+        <path d="M27 10 Q28 16 24 22 Q18 28 12 26 Q6 22 6 16 Q6 10 11 7 Q16 4 20 7 Q24 10 22 14 Q20 18 16 16" stroke="#3da898" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="2.5" fill="#3da898"/>
+      </svg>
+      <p class="d-name">Controle & Estimação</p>
+      <p class="d-angle">estabilidade de Lyapunov · regiões de atração</p>
+      <p class="d-desc">
+        Manter trajetórias em regiões desejadas diante de perturbações.
+        Espaço de estados, LQR, MPC com restrições, observadores de
+        Kalman e Luenberger para estimação de variáveis não medidas.
+      </p>
+      <div class="d-tags">
+        <span class="tag">PID</span><span class="tag">LQR</span><span class="tag">MPC</span>
+        <span class="tag">Kalman</span><span class="tag">python-control</span>
+      </div>
+    </div>
+
+    <div class="domain-card" style="--c: #5b8fd4">
+      <svg class="d-icon" viewBox="0 0 32 32" fill="none">
+        <rect x="8" y="14" width="16" height="10" rx="2" stroke="#5b8fd4" stroke-width="0.8" opacity="0.5"/>
+        <path d="M2 18 C8 18 10 24 16 24 C20 24 22 18 24 8" stroke="#5b8fd4" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M2 18 L8 18 L8 12 L16 12 L16 8 L24 8" stroke="#3a4060" stroke-width="0.5" stroke-dasharray="3 2"/>
+        <circle cx="16" cy="8" r="1.8" fill="#5b8fd4" opacity="0.8"/>
+      </svg>
+      <p class="d-name">Flow Assurance</p>
+      <p class="d-angle">transições de fase · bifurcações de regime</p>
+      <p class="d-desc">
+        Mapas T-P sintéticos para zonas de risco de cera e hidratos.
+        FMEA/Bow-Tie mínimo, dashboard Node-RED → InfluxDB → Grafana.
+        Contexto: candidatura NIDF/UFRJ em escoamento multifásico.
+      </p>
+      <div class="d-tags">
+        <span class="tag">T-P Maps</span><span class="tag">wax/hydrate</span>
+        <span class="tag">Node-RED</span><span class="tag">InfluxDB</span>
+      </div>
+    </div>
+
+    <div class="domain-card" style="--c: #9b6cd4">
+      <svg class="d-icon" viewBox="0 0 32 32" fill="none">
+        <circle cx="6" cy="16" r="2.5" stroke="#9b6cd4" stroke-width="1"/>
+        <circle cx="26" cy="8" r="2.5" stroke="#9b6cd4" stroke-width="1"/>
+        <circle cx="26" cy="24" r="2.5" stroke="#9b6cd4" stroke-width="1"/>
+        <circle cx="16" cy="16" r="2" fill="#9b6cd4" opacity="0.8"/>
+        <line x1="8.5" y1="16" x2="14" y2="16" stroke="#9b6cd4" stroke-width="0.7" opacity="0.7"/>
+        <line x1="17.5" y1="15" x2="23.5" y2="10" stroke="#9b6cd4" stroke-width="0.7" opacity="0.7"/>
+        <line x1="17.5" y1="17" x2="23.5" y2="22" stroke="#9b6cd4" stroke-width="0.7" opacity="0.7"/>
+      </svg>
+      <p class="d-name">IIoT · OT</p>
+      <p class="d-angle">rede de observadores distribuídos</p>
+      <p class="d-desc">
+        Telemetria industrial: Node-RED, InfluxDB, Grafana, Docker.
+        Foco em qualidade de dados, sincronismo temporal e
+        detecção de mudança de regime operacional.
+      </p>
+      <div class="d-tags">
+        <span class="tag">MQTT</span><span class="tag">time-series</span>
+        <span class="tag">Docker</span><span class="tag">OT/IT</span>
+      </div>
+    </div>
+
+    <div class="domain-card" style="--c: #c87070">
+      <svg class="d-icon" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="8" r="4" stroke="#c87070" stroke-width="1"/>
+        <line x1="12.5" y1="11.5" x2="7" y2="22" stroke="#c87070" stroke-width="1" opacity="0.6"/>
+        <line x1="19.5" y1="11.5" x2="25" y2="22" stroke="#c87070" stroke-width="1" opacity="0.6"/>
+        <rect x="3" y="22" width="8" height="7" rx="1" stroke="#524e46" stroke-width="0.8"/>
+        <rect x="21" y="22" width="8" height="7" rx="1" stroke="#524e46" stroke-width="0.8"/>
+        <line x1="11" y1="25.5" x2="21" y2="25.5" stroke="#c87070" stroke-width="0.5" stroke-dasharray="2 2"/>
+      </svg>
+      <p class="d-name">Segurança de Processo</p>
+      <p class="d-angle">percolação · cascatas de falha em barreiras</p>
+      <p class="d-desc">
+        HAZID, HAZOP, LOPA. Bow-Tie como modelo de barreiras entre
+        causas e consequências. Falhas sistêmicas são cascatas —
+        o mesmo mecanismo de percolação em grafos.
+      </p>
+      <div class="d-tags">
+        <span class="tag">HAZOP</span><span class="tag">LOPA</span>
+        <span class="tag">SIL</span><span class="tag">FMECA</span>
+      </div>
+    </div>
+
+    <div class="domain-card" style="--c: #e8b860">
+      <svg class="d-icon" viewBox="0 0 32 32" fill="none">
+        <path d="M2 28 L6 20 L10 24 L14 10 L18 17 L22 6 L26 13 L30 5" stroke="#524e46" stroke-width="0.5"/>
+        <path d="M2 28 L6 20 L10 24 L14 10 L18 17 L22 6 L26 13 L30 5" stroke="#e8b860" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+        <circle cx="14" cy="10" r="2.5" fill="#e8b860" opacity="0.9"/>
+        <line x1="14" y1="10" x2="14" y2="28" stroke="#e8b860" stroke-width="0.4" stroke-dasharray="2 3" opacity="0.4"/>
+      </svg>
+      <p class="d-name">Sistemas Complexos</p>
+      <p class="d-angle">emergência · caos · auto-organização</p>
+      <p class="d-desc">
+        Lyapunov, Kuramoto, percolação, bifurcações, estocástica.
+        O substrato teórico que conecta todos os outros domínios:
+        sistemas industriais são, fundamentalmente, sistemas complexos.
+      </p>
+      <div class="d-tags">
+        <span class="tag">Lyapunov</span><span class="tag">Kuramoto</span>
+        <span class="tag">networkx</span><span class="tag">bifurcation</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="hr">
+
+<!-- PROJETOS -->
+<div class="section-wrap fade" id="projetos">
+  <p class="s-label">// projetos</p>
+  <h2 class="s-title">Repositórios abertos.<br>Experimentos em progresso.</h2>
+  <div class="projects-grid">
+
+    <div class="project-card">
+      <p class="p-repo">flow-assurance-lite</p>
+      <p class="p-desc">
+        Mapas T-P sintéticos para zonas de risco de cera e hidratos.
+        FMEA/Bow-Tie mínimo e skeleton de dashboard
+        Node-RED → InfluxDB → Grafana. Candidatura NIDF/UFRJ.
+      </p>
+      <div class="p-tags">
+        <span class="tag">Python</span><span class="tag">Node-RED</span>
+        <span class="tag">InfluxDB</span><span class="tag">Grafana</span><span class="tag">Docker</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <p class="p-repo">predictive-maintenance-starter</p>
+      <p class="p-desc">
+        Feature extraction para saúde de máquinas, baseline de RUL
+        e alertas por email. Sinais claros e limiares interpretáveis.
+        Setup reproduzível, sem caixas-pretas.
+      </p>
+      <div class="p-tags">
+        <span class="tag">filterpy</span><span class="tag">scikit-learn</span>
+        <span class="tag">pandas</span><span class="tag">FMEA</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <p class="p-repo">mpc-mass-spring</p>
+      <p class="p-desc">
+        Modelo em espaço de estados de um sistema massa-mola.
+        LQR e primeiro esboço de MPC com restrições.
+        Base para controle de processos mais complexos.
+      </p>
+      <div class="p-tags">
+        <span class="tag">python-control</span><span class="tag">LQR</span>
+        <span class="tag">MPC</span><span class="tag">state-space</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <p class="p-repo">complex-systems-notes</p>
+      <p class="p-desc">
+        Notebooks curtos: expoente de Lyapunov, sincronização de Kuramoto
+        em grafos, percolação e cascatas, bases estocásticas.
+        Ênfase em resiliência e dinâmicas de rede.
+      </p>
+      <div class="p-tags">
+        <span class="tag">networkx</span><span class="tag">Lyapunov</span>
+        <span class="tag">Kuramoto</span><span class="tag">matplotlib</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="hr">
+
+<!-- STACK -->
+<div class="section-wrap fade" id="stack">
+  <p class="s-label">// stack</p>
+  <h2 class="s-title">Ferramentas.<br>Todas open-source.</h2>
+  <div class="stack-grid">
+    <div class="stack-group">
+      <p class="sg-label">Python</p>
+      <ul class="sg-items">
+        <li>numpy · scipy</li>
+        <li>pandas</li>
+        <li>scikit-learn</li>
+        <li>python-control</li>
+        <li>filterpy</li>
+        <li>networkx</li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <p class="sg-label">Visualização</p>
+      <ul class="sg-items">
+        <li>matplotlib</li>
+        <li>plotly</li>
+        <li>Grafana</li>
+        <li>Jupyter</li>
+        <li>Markdown</li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <p class="sg-label">IIoT / Infra</p>
+      <ul class="sg-items">
+        <li>Node-RED</li>
+        <li>InfluxDB</li>
+        <li>Docker</li>
+        <li>MQTT</li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <p class="sg-label">CAD / Outros</p>
+      <ul class="sg-items">
+        <li>Onshape</li>
+        <li>SolidWorks</li>
+        <li>Git / GitHub</li>
+        <li>Linux</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="hr">
+
+<!-- LEITURA -->
+<div class="section-wrap fade" id="leitura">
+  <p class="s-label">// leitura</p>
+  <h2 class="s-title">Referências formativas.</h2>
+  <div class="reading-grid">
+
+    <div class="r-cat">
+      <h3>Sistemas Dinâmicos</h3>
+      <div class="book">
+        <p class="book-author">Kolmogorov, Lyapunov, Poincaré</p>
+        <p class="book-note">fundamentos matemáticos</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Prigogine · Haken</p>
+        <p class="book-note">estruturas dissipativas · sinergética</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Åström & Murray — Feedback Systems</p>
+        <p class="book-note">controle moderno</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Ogata — State-Space Analysis</p>
+        <p class="book-note">espaço de estados</p>
+      </div>
+    </div>
+
+    <div class="r-cat">
+      <h3>Otimização & Probabilidade</h3>
+      <div class="book">
+        <p class="book-author">Bertsekas — Optimization</p>
+        <p class="book-note">programação dinâmica · MPC</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Jaynes — Probability Theory</p>
+        <p class="book-note">inferência bayesiana</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Murray-Spiegel — Statistics</p>
+        <p class="book-note">fundamentos estatísticos</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Box — "All models are wrong…"</p>
+        <p class="book-note">epistemologia de modelos</p>
+      </div>
+    </div>
+
+    <div class="r-cat">
+      <h3>Filosofia do Método</h3>
+      <div class="book">
+        <p class="book-author">Wittgenstein — Tractatus</p>
+        <p class="book-note">limites da linguagem</p>
+      </div>
+      <div class="book">
+        <p class="book-author">Heidegger</p>
+        <p class="book-note">clareza · restrições ontológicas</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="hr">
+
+<!-- FOOTER -->
+<footer>
+  <span>Anderson Pessoa · UFRJ · Eng. Mecânica</span>
+  <div class="footer-links">
+    <a href="https://github.com/anderkolm" target="_blank">github</a>
+    <a href="mailto:andersonpessoa@ufrj.br">contato</a>
+  </div>
+</footer>
+
+<script>
+// ──────────────────────────────────────────────
+//  VORTEX PARTICLE SYSTEM  (Kármán / network aesthetic)
+// ──────────────────────────────────────────────
+const canvas = document.getElementById('net');
+const ctx    = canvas.getContext('2d');
+let W, H, dpr;
+
+// ── VORTEX CENTERS (domain nodes — act as flow attractors) ──
+const ND = [
+  { id:'hub',  label:'sistemas\ncomplexos', sz:11, col:'#c8963c', glow:true },
+  { id:'phm',  label:'PHM · RUL',           sz:7,  col:'#c8963c' },
+  { id:'ctrl', label:'controle',            sz:7,  col:'#3da898' },
+  { id:'flow', label:'flow assurance',      sz:7,  col:'#5b8fd4' },
+  { id:'iiot', label:'IIoT · OT',           sz:7,  col:'#9b6cd4' },
+  { id:'safe', label:'segurança',           sz:7,  col:'#c87070' },
+  { id:'cplx', label:'complexos',           sz:7,  col:'#e8b860' },
+];
+
+// Each particle color pool — vivid on black like image ref
+const PCOLS = [
+  '#e87838','#c8963c','#e8c040',
+  '#3da898','#40c8b0','#5b8fd4','#88b8e8',
+  '#9b6cd4','#c090e8','#c87070','#e8a0a0',
+  '#6cb898','#50d0b8'
+];
+
+const NPART    = 95;  // number of flow particles
+const TRAIL    = 72;  // trail history length
+const NODE_EDGES = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,5],[2,3],[3,6],[4,5]];
+
+let nodes=[], parts=[], frame=0, hovered=null;
+
+// ── INIT ──
+function resize(){
+  dpr = window.devicePixelRatio||1;
+  W   = canvas.parentElement.offsetWidth;
+  H   = canvas.parentElement.offsetHeight;
+  canvas.width  = W*dpr;
+  canvas.height = H*dpr;
+  canvas.style.width  = W+'px';
+  canvas.style.height = H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  initNodes();
+  initParts();
+}
+
+function initNodes(){
+  const cx=W/2, cy=H/2, R=Math.min(W,H)*0.27;
+  nodes = ND.map((d,i)=>{
+    let x,y;
+    if(i===0){ x=cx; y=cy; }
+    else {
+      const a=((i-1)/6)*Math.PI*2 - Math.PI/2;
+      x=cx+Math.cos(a)*R; y=cy+Math.sin(a)*R;
+    }
+    return{...d, x, y,
+      vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35,
+      fx:0, fy:0, phase:Math.random()*Math.PI*2};
+  });
+}
+
+function initParts(){
+  parts = Array.from({length:NPART}, ()=>({
+    x: Math.random()*W,
+    y: Math.random()*H,
+    vx:(Math.random()-.5)*2.2,
+    vy:(Math.random()-.5)*2.2,
+    spin: Math.random()>.5 ? 1 : -1,
+    col: PCOLS[Math.floor(Math.random()*PCOLS.length)],
+    trail: [],
+    lw: 0.6 + Math.random()*0.55,
+  }));
+}
+
+// ── PHYSICS: node force-directed drift ──
+function physicsNodes(){
+  const cx=W/2, cy=H/2;
+  const KREP=3200, KSP=0.011, DAMP=0.88;
+  const R0=Math.min(W,H)*0.25;
+  for(const n of nodes){ n.fx=0; n.fy=0; }
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j];
+      const dx=b.x-a.x, dy=b.y-a.y;
+      const d=Math.hypot(dx,dy)+1, f=KREP/(d*d);
+      a.fx-=f*dx/d; a.fy-=f*dy/d;
+      b.fx+=f*dx/d; b.fy+=f*dy/d;
+    }
+  }
+  for(const [i,j] of NODE_EDGES){
+    const a=nodes[i],b=nodes[j];
+    const dx=b.x-a.x, dy=b.y-a.y;
+    const d=Math.hypot(dx,dy)+.01;
+    const r0=i===0?R0:R0*0.55;
+    const f=KSP*(d-r0);
+    a.fx+=f*dx/d; a.fy+=f*dy/d;
+    b.fx-=f*dx/d; b.fy-=f*dy/d;
+  }
+  const PAD=65;
+  for(const n of nodes){
+    n.fx+=(cx-n.x)*.003; n.fy+=(cy-n.y)*.003;
+    if(n.x<PAD)   n.fx+=(PAD-n.x)*.06;
+    if(n.x>W-PAD) n.fx-=(n.x-(W-PAD))*.06;
+    if(n.y<PAD)   n.fy+=(PAD-n.y)*.06;
+    if(n.y>H-PAD) n.fy-=(n.y-(H-PAD))*.06;
+    n.vx=(n.vx+n.fx)*DAMP; n.vy=(n.vy+n.fy)*DAMP;
+    n.x+=n.vx; n.y+=n.vy;
+  }
+}
+
+// ── PHYSICS: particle vortex dynamics ──
+// Each node acts as a vortex: tangential (orbital) force + distance-dependent radial
+function physicsParticles(){
+  const T=frame*0.0014;   // slow noise time
+  for(const p of parts){
+    p.trail.push({x:p.x, y:p.y});
+    if(p.trail.length>TRAIL) p.trail.shift();
+
+    let fx=0, fy=0;
+
+    for(const n of nodes){
+      const dx=p.x-n.x, dy=p.y-n.y;
+      const d2=dx*dx+dy*dy+1, d=Math.sqrt(d2);
+      if(d<240){
+        // Tangential force → creates curved orbital arcs
+        const tang=(n.sz*18)/d2;
+        fx += (-dy/d)*tang*p.spin;
+        fy += ( dx/d)*tang*p.spin;
+        // Radial: slight attraction mid-range, repulsion very close
+        const rad = d>55 ? -22/d2 : 650/d2;
+        fx += (dx/d)*rad;
+        fy += (dy/d)*rad;
+      }
+    }
+
+    // Slow global sinusoidal drift (Perlin substitute)
+    const s=0.009;
+    fx += Math.sin(p.x*s + T*1.1)*Math.cos(p.y*s*0.7 - T*0.8)*0.018;
+    fy += Math.cos(p.x*s*0.8 - T)*Math.sin(p.y*s + T*1.3)*0.018;
+
+    p.vx=p.vx*0.965+fx;
+    p.vy=p.vy*0.965+fy;
+
+    // Speed envelope
+    const spd=Math.hypot(p.vx,p.vy);
+    if(spd>2.9){p.vx*=2.9/spd; p.vy*=2.9/spd;}
+    if(spd<0.25){p.vx+=(Math.random()-.5)*.5; p.vy+=(Math.random()-.5)*.5;}
+
+    p.x+=p.vx; p.y+=p.vy;
+
+    // Edge wrap — clear trail to avoid diagonal teleport lines
+    if(p.x<-8){p.x+=W+16; p.trail=[];}
+    if(p.x>W+8){p.x-=W+16; p.trail=[];}
+    if(p.y<-8){p.y+=H+16; p.trail=[];}
+    if(p.y>H+8){p.y-=H+16; p.trail=[];}
+  }
+}
+
+// ── DRAW: smooth bezier trail in 3 opacity tiers ──
+function drawTrail(p){
+  const t=p.trail, n=t.length;
+  if(n<3) return;
+
+  // Three segments: ghost → mid → bright
+  const s1=Math.floor(n*0.38), s2=Math.floor(n*0.72);
+  const segs=[[0,s1,'08'],[s1,s2,'1e'],[s2,n,'52']];
+
+  for(const [a,b,hex] of segs){
+    if(b-a<2) continue;
+    ctx.beginPath();
+    ctx.moveTo(t[a].x, t[a].y);
+    for(let i=a+1;i<b;i++){
+      if(i<b-1){
+        const mx=(t[i].x+t[i+1].x)/2, my=(t[i].y+t[i+1].y)/2;
+        ctx.quadraticCurveTo(t[i].x,t[i].y,mx,my);
+      } else {
+        ctx.lineTo(t[i].x,t[i].y);
+      }
+    }
+    ctx.strokeStyle=p.col+hex;
+    ctx.lineWidth=p.lw;
+    ctx.stroke();
+  }
+
+  // Bright head dot
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,1.15,0,Math.PI*2);
+  ctx.fillStyle=p.col+'cc';
+  ctx.fill();
+}
+
+// ── DRAW: vortex center nodes ──
+function drawNodes(){
+  for(const n of nodes){
+    const pulse=1+.04*Math.sin(frame*.025+n.phase);
+    const r=n.sz*pulse;
+    const hov=hovered===n;
+
+    // Soft glow (hub or hovered)
+    if(n.glow||hov){
+      const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*3.8);
+      g.addColorStop(0,n.col+'2a');
+      g.addColorStop(1,n.col+'00');
+      ctx.beginPath();
+      ctx.arc(n.x,n.y,r*3.8,0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(n.x,n.y,hov?r*1.3:r,0,Math.PI*2);
+    ctx.fillStyle=n.col;
+    ctx.globalAlpha=hov?0.95:(n.sz>8?0.65:0.5);
+    ctx.fill();
+    ctx.globalAlpha=1;
+
+    // Ring
+    ctx.beginPath();
+    ctx.arc(n.x,n.y,r+(hov?4:2),0,Math.PI*2);
+    ctx.strokeStyle=n.col+(hov?'60':'22');
+    ctx.lineWidth=hov?1:0.5;
+    ctx.stroke();
+
+    // Label
+    if(hov||(n.sz>=7)){
+      const lines=n.label.split('\n');
+      ctx.font=`${n.sz>8?'500 ':''}${hov?12:11}px "IBM Plex Mono",monospace`;
+      ctx.textAlign='center';
+      ctx.fillStyle=hov?'#d8d4c4':(n.col+'66');
+      lines.forEach((ln,li)=>{
+        ctx.fillText(ln, n.x, n.y+r+(hov?16:14)+li*13);
+      });
+    }
+  }
+}
+
+// ── MAIN LOOP ──
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  frame++;
+  physicsNodes();
+  physicsParticles();
+  // Draw all trails first, nodes on top
+  ctx.lineJoin='round'; ctx.lineCap='round';
+  for(const p of parts) drawTrail(p);
+  drawNodes();
+  requestAnimationFrame(loop);
+}
+
+// ── INTERACTION ──
+canvas.addEventListener('mousemove',e=>{
+  const rc=canvas.getBoundingClientRect();
+  const mx=e.clientX-rc.left, my=e.clientY-rc.top;
+  let best=null, bd=52;
+  for(const n of nodes){
+    const d=Math.hypot(n.x-mx,n.y-my);
+    if(d<bd){bd=d;best=n;}
+  }
+  hovered=best;
+  canvas.style.cursor=best?'pointer':'default';
+});
+canvas.addEventListener('mouseleave',()=>{ hovered=null; });
+canvas.addEventListener('click',()=>{
+  const target=document.getElementById('dominios');
+  if(target) target.scrollIntoView({behavior:'smooth'});
+});
+
+window.addEventListener('resize',()=>{ ctx.setTransform(1,0,0,1,0,0); resize(); });
+resize();
+loop();
+
+// ── SCROLL FADE-IN ──
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    e.target.classList.add('in');
+    const children=[...e.target.querySelectorAll(
+      '.domain-card,.project-card,.stack-group,.r-cat,.stat'
+    )];
+    children.forEach((el,i)=>{
+      el.style.opacity='0';
+      el.style.transform='translateY(14px)';
+      el.style.transition=`opacity .55s ease ${i*.07}s, transform .55s ease ${i*.07}s`;
+      setTimeout(()=>{
+        el.style.opacity='1'; el.style.transform='translateY(0)';
+      },i*70+80);
+    });
+    obs.unobserve(e.target);
+  });
+},{threshold:.08});
+
+document.querySelectorAll('.fade').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
