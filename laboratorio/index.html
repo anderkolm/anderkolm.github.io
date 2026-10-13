@@ -1,0 +1,1533 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Laboratório Carioca de Automação Cidadã: construa, por voz e com IA, uma tecnologia que mede um problema do seu bairro usando os sensores do seu celular."><meta name="theme-color" content="#1c3f94"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Laboratório Carioca de Automação Cidadã</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: uma coluna estreita como um celular; o progresso é uma linha de ônibus com estações; o título é uma placa de rua carioca. */
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f6f8fb;
+  --ink:#0f1d3a; --muted:#56627a; --line:#d5dbe6;
+  --placa:#1c3f94; --placa-ink:#ffffff; --placa-soft:#e3e9f7; --placa-text:#1c3f94;
+  --sinal:#f2b400; --sinal-soft:#fff3cc; --sinal-ink:#7a5900; --on-sinal:#2a2000;
+  --ok:#1d7f46; --ok-soft:#dff3e7;
+  --alerta:#c9352a; --alerta-soft:#fde3e0;
+  --code-bg:#0f1d3a; --code-ink:#e8eefc; --code-muted:#8f9cc0;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1222; --surface:#131c31; --surface-2:#18233c;
+  --ink:#e7ecf7; --muted:#9aa6bf; --line:#27334e;
+  --placa:#3b66d1; --placa-ink:#ffffff; --placa-soft:#1b2a4d; --placa-text:#94b3ff;
+  --sinal:#ffc933; --sinal-soft:#3a2f0c; --sinal-ink:#ffd666; --on-sinal:#2a2000;
+  --ok:#3cbf74; --ok-soft:#10301f;
+  --alerta:#ff6b5c; --alerta-soft:#3d1714;
+  --code-bg:#070d1a; --code-ink:#e8eefc; --code-muted:#8090b8;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0b1222; --surface:#131c31; --surface-2:#18233c;
+  --ink:#e7ecf7; --muted:#9aa6bf; --line:#27334e;
+  --placa:#3b66d1; --placa-ink:#ffffff; --placa-soft:#1b2a4d; --placa-text:#94b3ff;
+  --sinal:#ffc933; --sinal-soft:#3a2f0c; --sinal-ink:#ffd666; --on-sinal:#2a2000;
+  --ok:#3cbf74; --ok-soft:#10301f;
+  --alerta:#ff6b5c; --alerta-soft:#3d1714;
+  --code-bg:#070d1a; --code-ink:#e8eefc; --code-muted:#8090b8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.05;text-wrap:balance;margin:0}
+h2{font-size:2rem;letter-spacing:.005em}
+h3{font-size:1.3rem;font-weight:600}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.eyebrow{font-family:var(--f-display);font-weight:600;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--placa-text)}
+a{color:var(--placa-text)}
+code,.mono{font-family:var(--f-mono);font-size:.86em}
+
+/* Placa de rua */
+.placa{background:var(--placa);color:var(--placa-ink);border-radius:8px;padding:6px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.placa-in{border:2px solid rgba(255,255,255,.85);border-radius:5px;padding:12px 14px 10px;display:flex;flex-direction:column;gap:2px}
+.placa-top{font-family:var(--f-display);font-weight:600;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;opacity:.9}
+.placa-name{font-family:var(--f-display);font-weight:700;font-size:clamp(1.9rem,8vw,2.6rem);line-height:.98;text-transform:uppercase;letter-spacing:.01em}
+.placa-foot{display:flex;justify-content:space-between;gap:8px;font-family:var(--f-display);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.5);margin-top:8px;padding-top:6px;opacity:.95}
+
+/* Linha de ônibus (progresso) */
+.linha{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px 8px;margin-top:14px}
+.linha .track{position:relative}
+.linha .track::before{content:"";position:absolute;left:8.33%;right:8.33%;top:9px;height:4px;background:var(--line);border-radius:2px}
+.linha .fill{position:absolute;left:8.33%;top:9px;height:4px;background:var(--placa);border-radius:2px;transition:width .3s}
+.linha ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);position:relative}
+.linha li{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;z-index:1}
+.linha button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.linha button:disabled{cursor:default}
+.linha .dot{width:22px;height:22px;border-radius:50%;background:var(--surface);border:3px solid var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:.72rem;color:var(--muted)}
+.linha li.done .dot{border-color:var(--placa);background:var(--placa);color:var(--placa-ink)}
+.linha li.cur .dot{border-color:var(--placa);color:var(--placa-text);box-shadow:0 0 0 4px var(--placa-soft)}
+.linha .lbl{font-family:var(--f-display);font-weight:600;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:center}
+.linha li.cur .lbl{color:var(--ink)}
+.linha button:focus-visible .dot{outline:3px solid var(--sinal);outline-offset:2px}
+@media (max-width:460px){.linha li:not(.cur) .lbl{visibility:hidden}}
+
+/* Blocos */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.note{background:var(--placa-soft);border-radius:var(--r);padding:12px 14px;font-size:.95rem}
+.warn{background:var(--sinal-soft);color:var(--ink);border-radius:var(--r);padding:12px 14px;font-size:.95rem}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}
+.steps li::before{counter-increment:s;content:counter(s);width:30px;height:30px;border-radius:50%;background:var(--placa);color:var(--placa-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:.9rem}
+.chip b{font-family:var(--f-display);font-weight:600;letter-spacing:.02em}
+.verbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.verb{border-top:4px solid var(--placa);background:var(--surface-2);border-radius:0;padding:8px 8px 10px;min-width:0}
+.verb b{display:block;font-family:var(--f-display);font-weight:700;font-size:1rem;letter-spacing:.06em;text-transform:uppercase}
+.verb span{font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
+
+/* Formulário */
+label.fld{display:flex;flex-direction:column;gap:6px;font-weight:500}
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+input[type=text]:focus,select:focus,textarea:focus{outline:none;border-color:var(--placa);box-shadow:0 0 0 3px var(--placa-soft)}
+.check{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;font-size:.95rem}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--placa)}
+.lik{display:flex;flex-direction:column;gap:8px;padding-block:12px;border-top:1px solid var(--line)}
+.lik:first-child{border-top:0}
+.lik-q{font-weight:500}
+.lik-o{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;position:relative}
+.lik-o input{position:absolute;opacity:0;pointer-events:none}
+.lik-o label{border:1.5px solid var(--line);border-radius:8px;text-align:center;padding:8px 0;font-family:var(--f-display);font-weight:700;font-size:1.1rem;cursor:pointer;background:var(--surface);user-select:none}
+.lik-o input:checked+label{background:var(--placa);border-color:var(--placa);color:var(--placa-ink)}
+.lik-o input:focus-visible+label{outline:3px solid var(--sinal);outline-offset:1px}
+.lik-ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:8px;position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;background:var(--surface);font-weight:500}
+.seg input:checked+label{background:var(--placa);border-color:var(--placa);color:var(--placa-ink)}
+.seg input:focus-visible+label{outline:3px solid var(--sinal);outline-offset:1px}
+
+/* Botões */
+.btn{font:inherit;font-family:var(--f-display);font-weight:700;font-size:1.08rem;letter-spacing:.04em;text-transform:uppercase;border-radius:8px;border:2px solid var(--placa);background:var(--placa);color:var(--placa-ink);padding:11px 18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;min-height:48px}
+.btn.ghost{background:transparent;color:var(--placa-text);border-color:var(--placa-text)}
+.btn.sinal{background:var(--sinal);border-color:var(--sinal);color:var(--on-sinal)}
+.btn.danger{background:var(--alerta);border-color:var(--alerta);color:#fff}
+.btn.sm{font-size:.9rem;padding:7px 12px;min-height:38px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible{outline:3px solid var(--sinal);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+.nav{display:flex;gap:10px;justify-content:space-between;padding-top:6px}
+.nav .btn{flex:1}
+.nav .btn.ghost{flex:0 0 auto}
+.err-msg{color:var(--alerta);font-size:.9rem;font-weight:500}
+
+/* Sensores (hero) */
+.sens-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sens{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.sens b{font-family:var(--f-display);font-weight:700;font-size:1.05rem;letter-spacing:.02em}
+.sens span{font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}
+.sens i{font-style:normal;font-family:var(--f-mono);font-size:.72rem;color:var(--placa-text);overflow-wrap:anywhere}
+
+/* Editor */
+.editor{width:100%;min-height:300px;font-family:var(--f-mono);font-size:13px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);border:0;border-radius:var(--r);padding:14px;tab-size:2;white-space:pre;overflow:auto;resize:vertical}
+.editor::placeholder{color:var(--code-muted)}
+.editor:focus{outline:3px solid var(--placa);outline-offset:0}
+pre.code{margin:0;font-family:var(--f-mono);font-size:12.5px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);border-radius:var(--r);padding:14px;overflow-x:auto;white-space:pre}
+.examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ex{all:unset;cursor:pointer;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ex:hover{border-color:var(--placa)}
+.ex:focus-visible{outline:3px solid var(--sinal)}
+.ex b{font-family:var(--f-display);font-weight:700;font-size:1.02rem}
+.ex span{font-size:.8rem;color:var(--muted)}
+
+/* Bancada */
+.status{border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:2px;border:2px solid var(--line);background:var(--surface);transition:background .2s,border-color .2s}
+.status .st{font-family:var(--f-display);font-weight:700;font-size:1.6rem;letter-spacing:.03em;text-transform:uppercase}
+.status .sm{font-size:.95rem}
+.status.normal{border-color:var(--ok);background:var(--ok-soft)}
+.status.normal .st{color:var(--ok)}
+.status.aviso{border-color:var(--sinal);background:var(--sinal-soft)}
+.status.aviso .st{color:var(--sinal-ink)}
+.status.alerta{border-color:var(--alerta);background:var(--alerta-soft)}
+.status.alerta .st{color:var(--alerta)}
+.status.parado .st{color:var(--muted)}
+.status.erro{border-color:var(--alerta);background:var(--alerta-soft)}
+.status.erro .st{color:var(--alerta)}
+@media (prefers-reduced-motion:no-preference){.status.alerta{animation:pulse 1s ease-in-out infinite}}
+@keyframes pulse{50%{box-shadow:0 0 0 6px var(--alerta-soft)}}
+.readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ro{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ro .k{font-family:var(--f-display);font-weight:600;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);overflow-wrap:anywhere}
+.ro .v{font-family:var(--f-display);font-weight:700;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro .v small{font-size:.9rem;font-weight:600;color:var(--muted);margin-left:3px}
+.ro canvas{width:100%;height:34px;display:block}
+.sensors{display:flex;flex-direction:column;gap:8px}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.srow .nm{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.srow .val{font-family:var(--f-mono);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.srow input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--sinal)}
+.srow .why{grid-column:1/-1;font-size:.82rem;color:var(--muted)}
+.badge{font-family:var(--f-display);font-weight:700;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 9px;border:1.5px solid currentColor;white-space:nowrap}
+.badge.real{color:var(--ok)}
+.badge.sim{color:var(--sinal-ink)}
+.badge.wait{color:var(--muted)}
+.srow .tools{display:flex;gap:6px;align-items:center}
+.cam{width:56px;height:42px;border-radius:6px;object-fit:cover;background:#000}
+.tap{all:unset;cursor:pointer;display:grid;place-items:center;text-align:center;min-height:120px;border-radius:var(--r);border:3px dashed var(--placa);background:var(--placa-soft);font-family:var(--f-display);font-weight:700;font-size:1.4rem;letter-spacing:.04em;text-transform:uppercase;color:var(--placa-text);user-select:none;-webkit-tap-highlight-color:transparent}
+.tap:active{background:var(--placa);color:var(--placa-ink)}
+.tap:focus-visible{outline:3px solid var(--sinal)}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.log li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:8px 12px;border-top:1px solid var(--line);font-size:.88rem}
+.log li:first-child{border-top:0}
+.log time{font-family:var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.log .ev{overflow-wrap:anywhere}
+.log .ev b{font-family:var(--f-mono);font-weight:600}
+.empty{padding:14px;color:var(--muted);font-size:.9rem;text-align:center}
+.errbox{border:2px solid var(--alerta);background:var(--alerta-soft);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px}
+.errbox h3{color:var(--alerta)}
+.errbox pre{margin:0;font-family:var(--f-mono);font-size:.8rem;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);opacity:.85}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+.kpi .k{font-size:.78rem;color:var(--muted);line-height:1.25}
+.kpi .v{font-family:var(--f-display);font-weight:700;font-size:1.8rem;line-height:1.05;font-variant-numeric:tabular-nums}
+
+/* Certificado */
+.cert{background:var(--placa);color:var(--placa-ink);border-radius:10px;padding:7px}
+.cert-in{border:2px solid rgba(255,255,255,.85);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.cert .what{font-family:var(--f-display);font-weight:700;font-size:1.7rem;line-height:1.05;text-transform:uppercase;overflow-wrap:anywhere}
+.cert .verbs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cert .verbs .verb{background:rgba(255,255,255,.12);border-top-color:var(--sinal)}
+.cert .verbs .verb span{color:rgba(255,255,255,.85)}
+.cert .meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--f-display);font-size:.95rem;letter-spacing:.04em;text-transform:uppercase;opacity:.95}
+
+/* Painel */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem;color:var(--muted);border-top:0;white-space:nowrap}
+.quote{border-left:3px solid var(--placa);padding:4px 0 4px 12px;font-size:.95rem;border-radius:0}
+.quote span{display:block;font-size:.8rem;color:var(--muted)}
+.pp{display:flex;flex-direction:column;gap:14px}
+.pp-legend{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pp-head{display:flex;justify-content:space-between;gap:8px;font-size:.92rem;margin-bottom:4px}
+.pp-head span:first-child{min-width:0;overflow-wrap:anywhere}
+.pp-track{position:relative;height:18px;margin-inline:7px}
+.pp-track::before{content:"";position:absolute;left:0;right:0;top:8px;height:2px;background:var(--line)}
+.pp-bar{position:absolute;top:7px;height:4px;background:var(--placa);opacity:.35;border-radius:2px}
+.pp-dot{position:absolute;top:2px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%)}
+.pp-dot.a{background:var(--placa-soft);border:2px solid var(--placa)}
+.pp-dot.b{background:var(--placa)}
+.pp-legend .pp-dot{position:relative;display:inline-block;transform:none;top:0;margin-left:6px}
+.pp-axis{display:flex;justify-content:space-between;margin-inline:3px;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:500;font-size:.92rem;z-index:20;max-width:calc(100% - 32px);text-align:center}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+footer nav{display:flex;flex-wrap:wrap;gap:14px}
+.hidden-media{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#linha[hidden] + main{margin-top:24px}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:10px}
+</style>
+
+<div class="wrap" id="app">
+  <header class="placa" aria-label="Laboratório Carioca de Automação Cidadã">
+    <div class="placa-in">
+      <span class="placa-top">Laboratório Carioca de</span>
+      <span class="placa-name">Automação Cidadã</span>
+      <div class="placa-foot"><span id="placa-left">Seu celular é o kit</span><span id="placa-right">Rio de Janeiro</span></div>
+    </div>
+  </header>
+
+  <nav class="linha" id="linha" aria-label="Progresso">
+    <div class="track"><span class="fill" id="linha-fill" style="width:0"></span>
+    <ol>
+      <li data-st="1"><button type="button" data-go="1" aria-label="Antes"><span class="dot">1</span><span class="lbl">Antes</span></button></li>
+      <li data-st="2"><button type="button" data-go="2" aria-label="Diagnóstico"><span class="dot">2</span><span class="lbl">Diagnóstico</span></button></li>
+      <li data-st="3"><button type="button" data-go="3" aria-label="Programa"><span class="dot">3</span><span class="lbl">Programa</span></button></li>
+      <li data-st="4"><button type="button" data-go="4" aria-label="Bancada"><span class="dot">4</span><span class="lbl">Bancada</span></button></li>
+      <li data-st="5"><button type="button" data-go="5" aria-label="Teste"><span class="dot">5</span><span class="lbl">Teste</span></button></li>
+      <li data-st="6"><button type="button" data-go="6" aria-label="Depois"><span class="dot">6</span><span class="lbl">Depois</span></button></li>
+    </ol></div>
+  </nav>
+
+  <main>
+    <!-- 0 · INÍCIO -->
+    <section data-step="0" class="stack-lg" hidden>
+      <div class="stack">
+        <h2>Seu celular já é um kit de automação.</h2>
+        <p>Em cerca de 40 minutos, você vai escolher um problema do seu bairro e construir uma tecnologia que mede esse problema de verdade, usando os sensores que já estão no seu celular. Você vai programar <b>conversando por voz</b> com uma inteligência artificial. Não precisa saber nada de eletrônica nem de programação.</p>
+      </div>
+
+      <div class="stack">
+        <p class="eyebrow">Os sensores que você já tem no bolso</p>
+        <div class="sens-grid">
+          <div class="sens"><b>Som</b><span>o microfone mede barulho</span><i>ler("som")</i></div>
+          <div class="sens"><b>Movimento</b><span>o acelerômetro sente vibração</span><i>ler("movimento")</i></div>
+          <div class="sens"><b>Inclinação</b><span>o giroscópio mede ângulo</span><i>ler("inclinacao")</i></div>
+          <div class="sens"><b>Luz</b><span>a câmera mede claridade</span><i>ler("luz")</i></div>
+          <div class="sens"><b>Local</b><span>o GPS marca onde você está</span><i>ler("local")</i></div>
+          <div class="sens"><b>Toque</b><span>a tela conta seus toques</span><i>ler("toque")</i></div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <p class="eyebrow">Toda automação faz quatro coisas</p>
+        <div class="verbs">
+          <div class="verb"><b>Sentir</b><span>o sensor mede</span></div>
+          <div class="verb"><b>Decidir</b><span>o código compara</span></div>
+          <div class="verb"><b>Agir</b><span>o celular alerta</span></div>
+          <div class="verb"><b>Avisar</b><span>o registro guarda</span></div>
+        </div>
+      </div>
+
+      <div class="card stack">
+        <h3>Como vai ser</h3>
+        <ol class="steps">
+          <li><div><b>Antes:</b> 6 perguntas rápidas sobre o que você sabe hoje.</div></li>
+          <li><div><b>Diagnóstico:</b> você conta à IA, por voz, o que incomoda no seu bairro e escolhe um problema.</div></li>
+          <li><div><b>Programa:</b> você pede o programa falando. A IA escreve o código.</div></li>
+          <li><div><b>Bancada:</b> você cola o código aqui e ele roda no seu celular, medindo o mundo real.</div></li>
+          <li><div><b>Teste e depois:</b> você ajusta até funcionar e responde as mesmas 6 perguntas.</div></li>
+        </ol>
+      </div>
+
+      <div class="note stack">
+        <p><b>Você vai precisar de:</b> este link aberto no celular e um aplicativo de IA gratuito com modo de voz (ChatGPT, Gemini ou Claude). Pode fazer sozinho ou em dupla.</p>
+      </div>
+
+      <div class="card stack">
+        <h3>Antes de começar</h3>
+        <p class="small muted">Esta atividade faz parte de uma pesquisa do Programa Jovens Cientistas Cariocas 2026. Não pedimos seu nome. Suas respostas ficam só neste aparelho e só saem dele se você decidir enviar no final. Você pode parar a qualquer momento.</p>
+        <label class="check" for="consent"><input type="checkbox" id="consent"><span>Entendi e aceito participar. Tenho 18 anos ou mais, ou tenho autorização do meu responsável.</span></label>
+        <p class="err-msg" id="consent-err" hidden>Marque a caixa acima para começar.</p>
+        <button class="btn" type="button" id="btn-start">Começar</button>
+      </div>
+    </section>
+
+    <!-- 1 · ANTES -->
+    <section data-step="1" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Estação 1 · Antes</p>
+        <h2>Como você chega hoje</h2>
+        <p class="muted">Não existe resposta certa. Responda pelo que você sente agora. Isso nos ajuda a saber se o laboratório fez diferença.</p>
+      </div>
+      <div class="card stack">
+        <label class="fld" for="bairro">Em que bairro você mora?<input type="text" id="bairro" autocomplete="off" placeholder="Ex.: Praça Seca"></label>
+        <label class="fld" for="faixa">Sua idade
+          <select id="faixa"><option value="">Escolha</option><option>até 17</option><option>18 a 24</option><option>25 a 34</option><option>35 a 49</option><option>50 ou mais</option></select>
+        </label>
+        <div class="stack" style="gap:8px">
+          <span class="lik-q">Você já mexeu com eletrônica ou programação?</span>
+          <div class="seg" role="radiogroup" aria-label="Experiência">
+            <input type="radio" name="exp" id="exp-0" value="nunca"><label for="exp-0">Nunca</label>
+            <input type="radio" name="exp" id="exp-1" value="pouco"><label for="exp-1">Um pouco</label>
+            <input type="radio" name="exp" id="exp-2" value="sim"><label for="exp-2">Sim</label>
+          </div>
+        </div>
+        <div class="stack" style="gap:8px">
+          <span class="lik-q">Você vai fazer</span>
+          <div class="seg" role="radiogroup" aria-label="Modo">
+            <input type="radio" name="modo" id="modo-0" value="sozinho"><label for="modo-0">Sozinho</label>
+            <input type="radio" name="modo" id="modo-1" value="dupla"><label for="modo-1">Em dupla</label>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="small muted" style="margin-bottom:6px">1 = discordo totalmente · 5 = concordo totalmente</p>
+        <div id="lik-pre"></div>
+      </div>
+      <p class="err-msg" id="pre-err" hidden>Responda todas as perguntas para seguir.</p>
+      <div class="nav"><button class="btn ghost" type="button" data-back>Voltar</button><button class="btn" type="button" id="btn-pre">Salvar e seguir</button></div>
+    </section>
+
+    <!-- 2 · DIAGNÓSTICO -->
+    <section data-step="2" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Estação 2 · Diagnóstico</p>
+        <h2>Conte à IA o que incomoda no seu bairro</h2>
+        <p>A IA vai ser sua guia. Ela foi instruída a dar dicas antes de respostas, a dizer de onde vêm as informações e a admitir quando não sabe.</p>
+      </div>
+      <div class="card stack">
+        <ol class="steps">
+          <li><div class="stack" style="gap:8px"><span><b>Copie o guia do laboratório.</b> É o texto que ensina a IA a te acompanhar.</span><div class="row"><button class="btn sinal" type="button" id="btn-copy-guide">Copiar guia</button><a class="small" href="#guia">ver o guia</a></div></div></li>
+          <li><div class="stack" style="gap:8px"><span><b>Abra um app de IA</b> e cole o guia como primeira mensagem.</span>
+            <div class="row">
+              <a class="btn ghost sm" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+              <a class="btn ghost sm" href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini</a>
+              <a class="btn ghost sm" href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>
+            </div></div></li>
+          <li><div><b>Ligue o modo de voz</b> e converse. Diga seu bairro e o que te incomoda no dia a dia de lá.</div></li>
+        </ol>
+        <p class="small muted" id="dupla-tip">Em dupla: um fala com a IA, o outro mexe no celular. Troquem de papel a cada estação.</p>
+      </div>
+      <div class="warn small"><b>Fique de olho:</b> a IA pode errar ou inventar números. Se algo parecer estranho, pergunte "de onde vem essa informação?".</div>
+      <div class="card stack">
+        <h3>O que vocês escolheram</h3>
+        <label class="fld" for="problema">Problema do bairro<input type="text" id="problema" autocomplete="off" placeholder="Ex.: barulho de obra até tarde da noite"></label>
+        <label class="fld" for="sensor">Sensor que vai medir
+          <select id="sensor"><option value="">Escolha</option><option value="som">Som (microfone)</option><option value="movimento">Movimento (acelerômetro)</option><option value="inclinacao">Inclinação (giroscópio)</option><option value="luz">Luz (câmera)</option><option value="local">Local (GPS)</option><option value="toque">Toque (tela)</option><option value="mais de um">Mais de um</option></select>
+        </label>
+      </div>
+      <p class="err-msg" id="diag-err" hidden>Escreva o problema e escolha o sensor para seguir.</p>
+      <div class="nav"><button class="btn ghost" type="button" data-back>Voltar</button><button class="btn" type="button" id="btn-diag">Já escolhemos</button></div>
+    </section>
+
+    <!-- 3 · PROGRAMA -->
+    <section data-step="3" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Estação 3 · Programa</p>
+        <h2>Peça o programa falando</h2>
+        <p>Diga à IA o que a sua tecnologia deve fazer, com suas palavras. Por exemplo: <i>"quero que o celular me avise quando o barulho passar do normal por mais de 5 segundos e anote a hora"</i>. A IA vai escrever o código. Copie e cole aqui embaixo.</p>
+      </div>
+      <div class="stack">
+        <label for="code" class="eyebrow">Código da IA</label>
+        <textarea id="code" class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="// Cole aqui o código que a IA escreveu.&#10;// Dica: no app da IA, use o botão Copiar do bloco de código.&#10;// Para colar aqui, toque e segure nesta caixa e escolha Colar."></textarea>
+        <div class="row between">
+          <button class="btn ghost sm" type="button" id="btn-paste">Colar</button>
+          <button class="btn ghost sm" type="button" id="btn-clear">Limpar</button>
+        </div>
+        <p class="small muted" id="paste-msg" hidden></p>
+      </div>
+      <details class="card">
+        <summary>Sem IA agora? Comece por um exemplo</summary>
+        <p class="small muted" style="margin-bottom:10px">Os exemplos servem para conhecer a bancada. Depois, peça à IA para adaptar o exemplo ao seu problema.</p>
+        <div class="examples" id="examples"></div>
+      </details>
+      <p class="err-msg" id="code-err" hidden>Cole um código antes de ir para a bancada.</p>
+      <div class="nav"><button class="btn ghost" type="button" data-back>Voltar</button><button class="btn" type="button" id="btn-to-bench">Rodar na bancada</button></div>
+    </section>
+
+    <!-- 4 · BANCADA -->
+    <section data-step="4" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Estação 4 · Bancada</p>
+        <h2>Seu programa, rodando no mundo real</h2>
+      </div>
+      <div class="status parado" id="status" role="status" aria-live="polite"><span class="st" id="st-t">Parado</span><span class="sm" id="st-m">Toque em Rodar. O celular vai pedir permissão para usar os sensores.</span></div>
+      <div class="row">
+        <button class="btn" type="button" id="btn-run">Rodar</button>
+        <button class="btn ghost" type="button" id="btn-stop" disabled>Parar</button>
+        <button class="btn ghost" type="button" id="btn-edit">Editar código</button>
+      </div>
+      <div id="errbox" class="errbox" hidden>
+        <h3 id="err-title">O programa travou</h3>
+        <p id="err-pt"></p>
+        <pre id="err-raw"></pre>
+        <div class="row"><button class="btn danger sm" type="button" id="btn-copy-err">Copiar erro para a IA</button><button class="btn ghost sm" type="button" data-go-code>Colar código corrigido</button></div>
+        <p class="small">Cole o erro na conversa com a IA. Ela vai explicar o que houve e mandar o código corrigido. Isso se chama <b>depurar</b>, e todo programador faz isso o tempo todo.</p>
+      </div>
+      <div id="tap-wrap" hidden><button class="tap" type="button" id="tap">Toque aqui<br><span class="small" style="font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:500" id="tap-n">0 toques</span></button></div>
+      <div class="stack">
+        <p class="eyebrow">O que o programa mostra</p>
+        <div class="readouts" id="readouts"><div class="empty" style="grid-column:1/-1" id="ro-empty">Os valores aparecem aqui quando o programa usa <code>mostrar()</code>.</div></div>
+      </div>
+      <div class="stack">
+        <p class="eyebrow">Sensores ligados</p>
+        <div class="sensors" id="sensors"><div class="empty">Nenhum sensor ligado ainda.</div></div>
+      </div>
+      <div class="stack">
+        <div class="row between"><p class="eyebrow">Registro</p><span class="small muted" id="log-n">0 anotações</span></div>
+        <ul class="log" id="log"><li class="empty" style="display:block">O que o programa anotar com <code>registrar()</code> aparece aqui, com hora e local.</li></ul>
+      </div>
+      <div class="note small">Versões testadas: <b id="ver-n">0</b> · Erros corrigidos: <b id="errs-n">0</b>. Quer mudar algo? Peça à IA por voz ("aumenta o limite", "avisa só depois de 10 segundos"), cole o código novo e rode de novo.</div>
+      <div class="nav"><button class="btn ghost" type="button" data-back>Voltar</button><button class="btn" type="button" id="btn-bench-done">Terminei os testes</button></div>
+      <video id="cam" class="hidden-media" playsinline muted></video>
+      <canvas id="camc" class="hidden-media" width="32" height="24"></canvas>
+    </section>
+
+    <!-- 5 · TESTE -->
+    <section data-step="5" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Estação 5 · Teste</p>
+        <h2>O que aconteceu na bancada</h2>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Versões do programa</div><div class="v" id="t-ver">0</div></div>
+        <div class="kpi"><div class="k">Erros corrigidos</div><div class="v" id="t-err">0</div></div>
+        <div class="kpi"><div class="k">Anotações no registro</div><div class="v" id="t-ev">0</div></div>
+      </div>
+      <div class="card stack">
+        <span class="lik-q">O seu protótipo funcionou?</span>
+        <div class="seg" role="radiogroup" aria-label="Funcionou">
+          <input type="radio" name="ok" id="ok-0" value="sim"><label for="ok-0">Funcionou</label>
+          <input type="radio" name="ok" id="ok-1" value="parcial"><label for="ok-1">Mais ou menos</label>
+          <input type="radio" name="ok" id="ok-2" value="nao"><label for="ok-2">Não funcionou</label>
+        </div>
+        <span class="lik-q">A IA errou alguma vez?</span>
+        <div class="seg" role="radiogroup" aria-label="IA errou">
+          <input type="radio" name="ia" id="ia-0" value="nao"><label for="ia-0">Não que eu tenha visto</label>
+          <input type="radio" name="ia" id="ia-1" value="percebi"><label for="ia-1">Sim, e eu percebi na hora</label>
+          <input type="radio" name="ia" id="ia-2" value="depois"><label for="ia-2">Sim, só vi depois</label>
+        </div>
+      </div>
+      <div class="card stack">
+        <label class="fld" for="explica">Sem olhar para a IA: explique em uma ou duas frases como o seu protótipo funciona.<textarea id="explica" rows="3" placeholder="Ex.: o microfone mede o barulho; se passar de 70 por 5 segundos, o celular apita e anota a hora."></textarea></label>
+      </div>
+      <details class="card">
+        <summary>Quer a versão física, com Arduino?</summary>
+        <p class="small" style="margin-bottom:10px">Copie o pedido abaixo e mande para a IA. Ela traduz o seu programa para uma placa ESP32 com um sensor de verdade e diz quais peças comprar.</p>
+        <button class="btn ghost sm" type="button" id="btn-arduino">Copiar pedido da versão Arduino</button>
+      </details>
+      <p class="err-msg" id="teste-err" hidden>Responda as duas perguntas e escreva sua explicação para seguir.</p>
+      <div class="nav"><button class="btn ghost" type="button" data-back>Voltar</button><button class="btn" type="button" id="btn-teste">Seguir</button></div>
+    </section>
+
+    <!-- 6 · DEPOIS -->
+    <section data-step="6" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Estação 6 · Depois</p>
+        <h2>Como você sai daqui</h2>
+        <p class="muted">As mesmas perguntas do começo. Responda pelo que você sente agora, sem olhar as respostas antigas.</p>
+      </div>
+      <div class="card">
+        <p class="small muted" style="margin-bottom:6px">1 = discordo totalmente · 5 = concordo totalmente</p>
+        <div id="lik-pos"></div>
+      </div>
+      <div class="card stack">
+        <label class="fld" for="mudou">O que mudou para você? (opcional)<textarea id="mudou" rows="3" placeholder="Ex.: não sabia que o celular tinha sensores; achei que programar era impossível."></textarea></label>
+      </div>
+      <p class="err-msg" id="pos-err" hidden>Responda todas as perguntas para ver o resultado.</p>
+      <div class="nav"><button class="btn ghost" type="button" data-back>Voltar</button><button class="btn" type="button" id="btn-pos">Ver meu resultado</button></div>
+    </section>
+
+    <!-- 7 · RESULTADO -->
+    <section data-step="7" class="stack-lg" hidden>
+      <div class="cert" id="cert">
+        <div class="cert-in">
+          <span class="placa-top">Laboratório Carioca de Automação Cidadã</span>
+          <span class="small" style="opacity:.9">Protótipo construído por um participante de</span>
+          <span class="what" id="c-bairro">—</span>
+          <span id="c-prob" style="font-size:1.05rem"></span>
+          <div class="verbs">
+            <div class="verb"><b>Sentiu</b><span id="c-s1">—</span></div>
+            <div class="verb"><b>Decidiu</b><span id="c-s2">—</span></div>
+            <div class="verb"><b>Agiu</b><span id="c-s3">—</span></div>
+            <div class="verb"><b>Avisou</b><span id="c-s4">—</span></div>
+          </div>
+          <div class="meta"><span id="c-min">—</span><span id="c-ver">—</span><span id="c-ok">—</span></div>
+        </div>
+      </div>
+      <div class="card stack">
+        <h3>Envie seu resultado para a pesquisa</h3>
+        <p class="small">O resultado vai sem seu nome, só com as respostas e os números da bancada. Mande para o número ou o grupo da rodada.</p>
+        <a class="btn" id="btn-wa" href="#" target="_blank" rel="noopener">Enviar no WhatsApp</a>
+        <button class="btn ghost" type="button" id="btn-copy-res">Copiar resultado</button>
+        <pre class="code" id="res-text" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+      </div>
+      <div class="stack">
+        <button class="btn ghost" type="button" id="btn-again">Fazer outro protótipo</button>
+        <button class="btn ghost" type="button" id="btn-reset">Novo participante neste aparelho</button>
+      </div>
+    </section>
+
+    <!-- GUIA -->
+    <section data-view="guia" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Guia do laboratório</p>
+        <h2>O texto que ensina a IA a te acompanhar</h2>
+        <p>Cole este texto como primeira mensagem no ChatGPT, Gemini ou Claude e depois converse por voz. Ele funciona em qualquer IA, de propósito: o laboratório não depende de nenhuma empresa.</p>
+        <div class="row"><button class="btn sinal" type="button" id="btn-copy-guide2">Copiar guia</button><a class="btn ghost" href="#" id="back-from-guia">Voltar ao laboratório</a></div>
+      </div>
+      <pre class="code" id="guia-text" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+    </section>
+
+    <!-- PAINEL -->
+    <section data-view="painel" class="stack-lg" hidden>
+      <div class="stack">
+        <p class="eyebrow">Painel do pesquisador</p>
+        <h2>Resultados das rodadas</h2>
+        <p>Cole aqui as mensagens que os participantes mandaram no WhatsApp. Pode colar a conversa inteira: o painel acha os códigos <code>LC1.</code> sozinho e ignora o resto.</p>
+      </div>
+      <textarea id="pn-in" class="editor" style="min-height:140px;white-space:pre-wrap" spellcheck="false" placeholder="Cole aqui as mensagens recebidas."></textarea>
+      <div class="row">
+        <button class="btn" type="button" id="pn-go">Analisar</button>
+        <button class="btn ghost" type="button" id="pn-demo">Ver com dados de exemplo</button>
+        <a class="btn ghost" href="#">Voltar ao laboratório</a>
+      </div>
+      <div id="pn-out" class="stack-lg"><div class="card empty">Nenhum resultado ainda. Cole as mensagens e toque em Analisar.</div></div>
+    </section>
+  </main>
+
+  <footer>
+    <nav><a href="#">Laboratório</a><a href="#guia">Guia de IA</a><a href="#painel">Painel do pesquisador</a></nav>
+    <span>Laboratório Carioca de Automação Cidadã · pesquisa de Anderson Martins Araújo Pessoa no Programa Jovens Cientistas Cariocas 2026.</span>
+    <span>Os valores dos sensores do celular são aproximados e não calibrados: servem para comparar, não para laudo técnico.</span>
+  </footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Conteúdo ---------- */
+const QS = [
+  "Sei explicar como funciona um sensor.",
+  "Consigo ler e entender um código simples.",
+  "Me sinto capaz de construir uma tecnologia que funcione.",
+  "Tenho interesse em trabalhar com tecnologia ou automação.",
+  "A tecnologia pode ajudar a resolver problemas do meu bairro.",
+  "Consigo perceber quando uma IA me dá uma resposta errada."
+];
+const QS_SHORT = ["Explicar sensor","Ler código","Construir tecnologia","Interesse em automação","Tecnologia no bairro","Perceber erro da IA"];
+
+const EXAMPLES = [
+ {id:"barulho", t:"Medidor de barulho", d:"obra, festa, trânsito", code:
+`// Medidor de barulho da rua
+let limite = 70;      // dB: acima disso é barulho demais
+let tempoAlto = 0;    // há quantos segundos está alto
+
+function configurar() {
+  ligar("som");
+}
+
+function repetir() {
+  let nivel = media("som", 2);          // SENTIR
+  mostrar("Barulho", nivel, "dB");
+
+  if (nivel > limite) {                 // DECIDIR
+    tempoAlto = tempoAlto + 0.1;
+  } else {
+    tempoAlto = 0;
+  }
+
+  if (tempoAlto > 5) {                  // AGIR
+    alerta("Barulho alto há mais de 5 segundos");
+    registrar("barulho_alto", nivel.toFixed(0));   // AVISAR
+  } else {
+    normal();
+  }
+}`},
+ {id:"vibracao", t:"Sismógrafo de bolso", d:"caminhão, obra, encosta", code:
+`// Sismógrafo de bolso: vibração de obra, caminhão ou encosta
+// Deixe o celular deitado no chão, no muro ou no parapeito
+let limite = 1.5;     // m/s²: acima disso conta como tremor
+let tremendo = false;
+
+function configurar() {
+  ligar("movimento");
+}
+
+function repetir() {
+  let tremor = ler("movimento");              // SENTIR
+  mostrar("Vibração", tremor, "m/s²");
+
+  if (tremor > limite && !tremendo) {         // DECIDIR
+    tremendo = true;
+    contar("tremores");                       // AGIR
+    aviso("Tremor detectado");
+    registrar("tremor", tremor.toFixed(2));   // AVISAR
+  } else if (tremor < limite * 0.6) {
+    tremendo = false;
+    normal();
+  }
+}`},
+ {id:"poste", t:"Caçador de poste apagado", d:"iluminação pública", code:
+`// Caçador de poste apagado: aponte a câmera para a rua, à noite
+let limiteEscuro = 15;   // abaixo disso, consideramos sem iluminação
+
+function configurar() {
+  ligar("luz");
+  ligar("local");
+}
+
+function repetir() {
+  let brilho = media("luz", 2);                    // SENTIR
+  mostrar("Brilho", brilho, "");
+
+  if (brilho < limiteEscuro) {                     // DECIDIR
+    alerta("Trecho escuro");                       // AGIR
+    registrar("trecho_escuro", brilho.toFixed(0)); // AVISAR (com GPS)
+  } else {
+    normal();
+  }
+}`},
+ {id:"prumo", t:"Fiscal de inclinação", d:"muro, poste, árvore", code:
+`// Fiscal de inclinação: encoste o celular em pé no muro, poste ou árvore
+let tolerancia = 3;   // graus de desvio aceitos
+
+function configurar() {
+  ligar("inclinacao");
+}
+
+function repetir() {
+  let angulo = media("inclinacao", 1);       // SENTIR
+  let desvio = Math.abs(90 - angulo);        // quanto foge do prumo
+  mostrar("Ângulo", angulo, "°");
+  mostrar("Fora do prumo", desvio, "°");
+
+  if (desvio > tolerancia * 3) {             // DECIDIR
+    alerta("Muito inclinado: " + desvio.toFixed(1) + "°");
+    registrar("inclinado", desvio.toFixed(1));   // AVISAR
+  } else if (desvio > tolerancia) {
+    aviso("Levemente inclinado");
+  } else {
+    normal();
+  }
+}`},
+ {id:"alagamento", t:"Mapeador de alagamento", d:"toque + GPS", code:
+`// Mapeador de alagamento: toque na tela em cada ponto alagado
+let marcados = 0;
+
+function configurar() {
+  ligar("toque");
+  ligar("local");
+}
+
+function repetir() {
+  let toques = ler("toque");                 // SENTIR (você é o sensor)
+  let lugar = ler("local");
+  mostrar("Precisão do GPS", lugar.precisao, "m");
+
+  if (toques > marcados) {                   // DECIDIR
+    marcados = toques;
+    apitar();                                // AGIR
+    registrar("ponto_alagado", marcados);    // AVISAR (com GPS)
+  }
+  mostrar("Pontos marcados", marcados, "");
+}`},
+ {id:"onibus", t:"Cronômetro do ponto", d:"espera de ônibus", code:
+`// Cronômetro do ponto de ônibus
+// Toque 1 vez quando chegar ao ponto e 1 vez quando o ônibus chegar
+let chegada = 0;
+let esperando = false;
+let ultimoToque = 0;
+
+function configurar() {
+  ligar("toque");
+  ligar("local");
+}
+
+function repetir() {
+  let toques = ler("toque");
+  if (toques > ultimoToque) {                // SENTIR: um toque novo
+    ultimoToque = toques;
+    if (!esperando) {                        // DECIDIR
+      esperando = true;
+      chegada = segundos();
+      aviso("Esperando o ônibus...");
+    } else {
+      esperando = false;
+      let minutos = (segundos() - chegada) / 60;
+      registrar("espera_onibus_min", minutos.toFixed(1));   // AVISAR
+      normal();
+    }
+  }
+  if (esperando) {
+    let minutos = (segundos() - chegada) / 60;
+    mostrar("Esperando há", minutos, "min");                 // AGIR
+    if (minutos > 20) alerta("Mais de 20 minutos de espera");
+  }
+}`}
+];
+
+function guideText(modo){
+  const quem = modo === "dupla" ? "Somos uma dupla" : "Estou sozinho(a)";
+  return `Você é o Guia do Laboratório Carioca de Automação Cidadã. ${quem} e nunca fizemos programação nem eletrônica. Vamos conversar por voz.
+
+SEU PAPEL
+Guiar, em passos curtos, a construção de um protótipo de automação que mede um problema real do nosso bairro usando os sensores do próprio celular. Fale no máximo 4 frases por vez e espere a resposta. Use linguagem simples, sem jargão.
+
+REGRAS DE ENSINO
+- Antes de dar a solução de qualquer dúvida, dê uma dica. Se não resolver, uma dica mais direta. Só depois a resposta completa.
+- Quando explicar um erro, diga o que causou e por quê, não só a correção.
+- De vez em quando, peça para explicarmos com nossas palavras o que acabamos de fazer.
+- Nunca invente números, leis ou fontes. Quando citar um dado, diga de onde ele vem. Se não tiver certeza, diga "não tenho certeza".
+
+ETAPA 1 · DIAGNÓSTICO (até 10 minutos)
+1. Pergunte nosso bairro e o que mais incomoda no dia a dia de lá.
+2. Conte o que se sabe sobre problemas urbanos nesse bairro (fontes públicas possíveis: Central 1746, Alerta Rio, COR, Data.Rio, IBGE, ISP-RJ). Diga a fonte de cada informação.
+3. Ajude a escolher UM problema que dê para medir com um destes sensores do celular: som (microfone), movimento (acelerômetro), inclinacao (giroscópio), luz (câmera), local (GPS), toque (tela).
+4. Explique em uma frase o que esse sensor mede e como ele "sente" o mundo.
+
+ETAPA 2 · O PROGRAMA
+Quando pedirmos, escreva o programa para a Bancada do laboratório seguindo EXATAMENTE a referência abaixo. Entregue o código inteiro em um único bloco de código. Depois do código, explique em 3 linhas: o que ele SENTE, o que DECIDE e como AGE e AVISA.
+
+ETAPA 3 · TESTE E AJUSTE
+- Se mandarmos um erro da bancada, explique a causa e mande o código corrigido inteiro.
+- Se pedirmos mudanças ("muda o limite", "avisa só depois de 5 segundos"), mande o código inteiro de novo.
+
+ETAPA 4 · FECHAMENTO
+Pergunte se funcionou e peça para explicarmos, sem ajuda, como o protótipo funciona. Se quisermos, traduza o programa para Arduino (placa ESP32 com um sensor físico equivalente) e diga quais peças comprar.
+
+REFERÊNCIA DA BANCADA (JavaScript simples, roda no navegador do celular)
+configurar()                  roda 1 vez quando o programa começa
+repetir()                     roda 10 vezes por segundo
+ligar("sensor")               liga um sensor: "som", "movimento", "inclinacao", "luz", "local", "toque"
+ler("som")                    nível de som em dB aproximado (0 a 120)
+ler("movimento")              intensidade da vibração em m/s² (0 = parado)
+ler("inclinacao")             ângulo em graus (0 = celular deitado, 90 = celular em pé)
+ler("luz")                    brilho visto pela câmera traseira (0 = escuro, 100 = muito claro)
+ler("local")                  objeto { lat, lng, precisao }, precisão em metros
+ler("toque")                  total de toques na área de toque da bancada
+media("som", 3)               média de um sensor nos últimos 3 segundos (máximo 30)
+segundos()                    segundos desde que o programa começou
+agora()                       hora atual, como "14:05:32"
+mostrar("Nome", valor, "unidade")   mostra um número na tela, com gráfico
+alerta("mensagem")            tela vermelha, apito e vibração
+aviso("mensagem")             tela amarela de atenção
+normal()                      volta ao estado normal
+registrar("evento", valor)    anota no registro com hora e GPS (no máximo 1 vez a cada 2 segundos por evento)
+contar("nome")                soma 1 num contador, mostra na tela e devolve o total
+apitar()                      toca um apito curto
+vibrar(300)                   vibra por 300 milissegundos (em celulares que permitem)
+
+REGRAS DO CÓDIGO
+- Use só as funções da referência, mais operações de JavaScript (if, let, Math.abs, toFixed).
+- Variáveis no topo do programa. Nada de while, for infinito, alert(), HTML, fetch() ou bibliotecas.
+- Comentários em português simples, marcando onde o programa SENTE, DECIDE, AGE e AVISA.
+
+EXEMPLO DE PROGRAMA
+// Medidor de barulho da rua
+let limite = 70;      // dB: acima disso é barulho demais
+let tempoAlto = 0;    // há quantos segundos está alto
+
+function configurar() {
+  ligar("som");
+}
+
+function repetir() {
+  let nivel = media("som", 2);          // SENTIR
+  mostrar("Barulho", nivel, "dB");
+  if (nivel > limite) {                 // DECIDIR
+    tempoAlto = tempoAlto + 0.1;
+  } else {
+    tempoAlto = 0;
+  }
+  if (tempoAlto > 5) {                  // AGIR
+    alerta("Barulho alto há mais de 5 segundos");
+    registrar("barulho_alto", nivel.toFixed(0));   // AVISAR
+  } else {
+    normal();
+  }
+}
+
+Comece agora pela Etapa 1, com uma pergunta curta.`;
+}
+
+/* ---------- Estado ---------- */
+const KEY = "lcac_estado_v1";
+function blank(){
+  return {step:0, consent:false, pre:{bairro:"",faixa:"",exp:"",modo:"",r:[0,0,0,0,0,0]},
+    diag:{problema:"",sensor:""}, code:"", example:"", versions:0, lastHash:"", errors:0, errPending:false,
+    runs:0, sensorsUsed:[], lastSensors:[], events:[], teste:{ok:"",ia:"",explica:""}, pos:{r:[0,0,0,0,0,0],mudou:""},
+    t:{start:0,diag:0,prog:0,bench:0,teste:0,end:0}, maxStep:0};
+}
+let S = blank();
+try{ const raw = localStorage.getItem(KEY); if(raw){ const o = JSON.parse(raw); S = Object.assign(blank(), o); } }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ---------- Utilidades ---------- */
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>Array.from(el.querySelectorAll(s));
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
+function copyText(txt, okMsg){
+  const done = ()=>toast(okMsg||"Copiado");
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt,okMsg));
+      return;
+    }
+  }catch(e){}
+  fallbackCopy(txt,okMsg);
+}
+function fallbackCopy(txt, okMsg){
+  const ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.top="0"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,txt.length);
+  let ok=false; try{ ok=document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+  toast(ok ? (okMsg||"Copiado") : "Não deu para copiar sozinho. Selecione o texto e copie.");
+}
+function hash(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return String(h); }
+function norm(n){
+  n = String(n||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
+  const map = {microfone:"som", barulho:"som", ruido:"som", acelerometro:"movimento", vibracao:"movimento", giroscopio:"inclinacao", angulo:"inclinacao", camera:"luz", brilho:"luz", gps:"local", localizacao:"local", tela:"toque", toques:"toque"};
+  return map[n] || n;
+}
+function minutes(a,b){ return a&&b ? Math.max(0, Math.round((b-a)/60000)) : 0; }
+function cleanCode(c){
+  c = String(c||"");
+  const m = c.match(/```(?:[a-zA-Z]*)?\s*\n([\s\S]*?)```/);
+  if(m) c = m[1];
+  return c.replace(/ /g," ").replace(/[“”]/g,'"').replace(/[‘’]/g,"'").trim();
+}
+
+/* ---------- Likert ---------- */
+function buildLikert(rootId, prefix, values){
+  const root = document.getElementById(rootId);
+  root.innerHTML = "";
+  QS.forEach((q,i)=>{
+    const g = document.createElement("div"); g.className="lik"; g.setAttribute("role","radiogroup"); g.setAttribute("aria-label",q);
+    const p = document.createElement("span"); p.className="lik-q"; p.textContent = (i+1)+". "+q; g.appendChild(p);
+    const o = document.createElement("div"); o.className="lik-o";
+    for(let v=1; v<=5; v++){
+      const id = prefix+"_q"+i+"_"+v;
+      const inp = document.createElement("input"); inp.type="radio"; inp.name=prefix+"_q"+i; inp.id=id; inp.value=v;
+      if(values[i]===v) inp.checked=true;
+      inp.addEventListener("change",()=>{ values[i]=v; save(); });
+      const lb = document.createElement("label"); lb.htmlFor=id; lb.textContent=v;
+      o.appendChild(inp); o.appendChild(lb);
+    }
+    g.appendChild(o);
+    const e = document.createElement("div"); e.className="lik-ends"; e.innerHTML="<span>discordo</span><span>concordo</span>"; g.appendChild(e);
+    root.appendChild(g);
+  });
+}
+
+/* ---------- Navegação ---------- */
+function showView(){
+  const h = location.hash.replace("#","");
+  const view = (h==="guia"||h==="painel") ? h : "";
+  $$("section[data-step]").forEach(s=>s.hidden = !!view || Number(s.dataset.step)!==S.step);
+  $$("section[data-view]").forEach(s=>s.hidden = s.dataset.view!==view);
+  $("#linha").hidden = !!view || S.step===0 || S.step===7;
+  if(view==="guia"){ $("#guia-text").textContent = guideText(S.pre.modo); }
+  if(!view) renderLinha();
+  window.scrollTo(0,0);
+}
+function go(n){
+  if(S.step===4 && n!==4) stopRun(false);
+  S.step = n; S.maxStep = Math.max(S.maxStep, n); save();
+  if(location.hash){ history.replaceState(null,"",location.pathname+location.search); }
+  showView();
+  if(n===5) fillTeste();
+  if(n===7) fillResult();
+}
+function renderLinha(){
+  $$("#linha li").forEach(li=>{
+    const st = Number(li.dataset.st);
+    li.classList.toggle("done", st < S.step);
+    li.classList.toggle("cur", st === S.step);
+    const b = li.querySelector("button"); b.disabled = st > S.maxStep;
+    if(st === S.step) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current");
+  });
+  const pct = Math.min(1, Math.max(0,(S.step-1)/5));
+  $("#linha-fill").style.width = (pct*83.33)+"%";
+}
+$$("#linha button").forEach(b=>b.addEventListener("click",()=>{ const n=Number(b.dataset.go); if(n<=S.maxStep) go(n); }));
+$$("[data-back]").forEach(b=>b.addEventListener("click",()=>go(Math.max(0,S.step-1))));
+window.addEventListener("hashchange", showView);
+$("#back-from-guia").addEventListener("click",(e)=>{ e.preventDefault(); history.replaceState(null,"",location.pathname+location.search); showView(); });
+
+/* ---------- Estação 0 ---------- */
+$("#consent").checked = S.consent;
+$("#consent").addEventListener("change",e=>{ S.consent=e.target.checked; $("#consent-err").hidden=true; save(); });
+$("#btn-start").addEventListener("click",()=>{
+  if(!S.consent){ $("#consent-err").hidden=false; return; }
+  go(1);
+});
+
+/* ---------- Estação 1 ---------- */
+buildLikert("lik-pre","pre",S.pre.r);
+$("#bairro").value = S.pre.bairro; $("#faixa").value = S.pre.faixa;
+$("#bairro").addEventListener("input",e=>{ S.pre.bairro=e.target.value; save(); updatePlaca(); });
+function updatePlaca(){ $("#placa-right").textContent = S.pre.bairro.trim() ? S.pre.bairro.trim().slice(0,28) : "Rio de Janeiro"; }
+updatePlaca();
+$("#faixa").addEventListener("change",e=>{ S.pre.faixa=e.target.value; save(); });
+$$("input[name=exp]").forEach(r=>{ r.checked = r.value===S.pre.exp; r.addEventListener("change",()=>{S.pre.exp=r.value; save();}); });
+$$("input[name=modo]").forEach(r=>{ r.checked = r.value===S.pre.modo; r.addEventListener("change",()=>{S.pre.modo=r.value; save(); updateDupla();}); });
+function updateDupla(){ $("#dupla-tip").hidden = S.pre.modo!=="dupla"; }
+updateDupla();
+$("#btn-pre").addEventListener("click",()=>{
+  const ok = S.pre.bairro.trim() && S.pre.faixa && S.pre.exp && S.pre.modo && S.pre.r.every(v=>v>0);
+  $("#pre-err").hidden = !!ok; if(!ok) return;
+  if(!S.t.start) S.t.start = Date.now();
+  go(2);
+});
+
+/* ---------- Estação 2 ---------- */
+$("#problema").value = S.diag.problema; $("#sensor").value = S.diag.sensor;
+$("#problema").addEventListener("input",e=>{ S.diag.problema=e.target.value; save(); });
+$("#sensor").addEventListener("change",e=>{ S.diag.sensor=e.target.value; save(); });
+function copyGuide(){ copyText(guideText(S.pre.modo), "Guia copiado. Agora cole no app de IA."); }
+$("#btn-copy-guide").addEventListener("click", copyGuide);
+$("#btn-copy-guide2").addEventListener("click", copyGuide);
+$("#btn-diag").addEventListener("click",()=>{
+  const ok = S.diag.problema.trim() && S.diag.sensor;
+  $("#diag-err").hidden = !!ok; if(!ok) return;
+  if(!S.t.diag) S.t.diag = Date.now();
+  go(3);
+});
+
+/* ---------- Estação 3 ---------- */
+const codeEl = $("#code");
+codeEl.value = S.code;
+codeEl.addEventListener("input",()=>{ S.code = codeEl.value; $("#code-err").hidden=true; save(); });
+codeEl.addEventListener("keydown",e=>{ if(e.key==="Tab"){ e.preventDefault(); const s=codeEl.selectionStart; codeEl.setRangeText("  ",s,codeEl.selectionEnd,"end"); S.code=codeEl.value; save(); } });
+const exRoot = $("#examples");
+EXAMPLES.forEach(ex=>{
+  const b = document.createElement("button"); b.type="button"; b.className="ex";
+  b.innerHTML = "<b></b><span></span>"; b.querySelector("b").textContent=ex.t; b.querySelector("span").textContent=ex.d;
+  b.addEventListener("click",()=>{ codeEl.value = ex.code; S.code = ex.code; S.example = ex.id; save(); toast("Exemplo carregado: "+ex.t); });
+  exRoot.appendChild(b);
+});
+$("#btn-paste").addEventListener("click",()=>{
+  const msg = $("#paste-msg");
+  const fail = ()=>{ msg.hidden=false; msg.textContent="O navegador não deixou colar por aqui. Toque e segure dentro da caixa preta e escolha Colar."; codeEl.focus(); };
+  try{
+    if(navigator.clipboard && navigator.clipboard.readText){
+      navigator.clipboard.readText().then(t=>{ if(!t){ fail(); return; } codeEl.value=cleanCode(t); S.code=codeEl.value; save(); msg.hidden=true; toast("Código colado"); }).catch(fail);
+    } else fail();
+  }catch(e){ fail(); }
+});
+$("#btn-clear").addEventListener("click",()=>{ codeEl.value=""; S.code=""; save(); codeEl.focus(); });
+$("#btn-to-bench").addEventListener("click",()=>{
+  const c = cleanCode(codeEl.value);
+  if(!c){ $("#code-err").hidden=false; return; }
+  if(c!==codeEl.value){ codeEl.value=c; S.code=c; }
+  if(!S.t.prog) S.t.prog = Date.now();
+  save(); go(4); resetBenchView();
+});
+$$("[data-go-code]").forEach(b=>b.addEventListener("click",()=>{ go(3); setTimeout(()=>codeEl.focus(),50); }));
+$("#btn-edit").addEventListener("click",()=>go(3));
+
+/* ---------- Bancada: sensores ---------- */
+const SENS = {
+  som:{nome:"Som", un:"dB", min:0, max:120, step:1, sim:45},
+  movimento:{nome:"Movimento", un:"m/s²", min:0, max:15, step:0.1, sim:0.2},
+  inclinacao:{nome:"Inclinação", un:"°", min:0, max:180, step:1, sim:88},
+  luz:{nome:"Luz", un:"", min:0, max:100, step:1, sim:60},
+  local:{nome:"Local (GPS)", un:"m", min:0, max:500, step:1, sim:0},
+  toque:{nome:"Toque", un:"", min:0, max:0, step:1, sim:0}
+};
+const BASE_LAT = -22.8962, BASE_LNG = -43.3529;
+let live = {};          // nome -> {mode, value, hist:[], why, cleanup}
+let audioCtx = null;
+function getAudio(){
+  if(!audioCtx){ const AC = window.AudioContext||window.webkitAudioContext; if(AC){ try{ audioCtx = new AC(); }catch(e){} } }
+  if(audioCtx && audioCtx.state==="suspended"){ try{ audioCtx.resume(); }catch(e){} }
+  return audioCtx;
+}
+function setSim(name, why){
+  const L = live[name]; if(!L) return;
+  if(L.cleanup){ try{L.cleanup();}catch(e){} L.cleanup=null; }
+  L.mode="sim"; L.why = why || L.why || "";
+  if(name!=="local" && name!=="toque") L.value = L.simValue;
+  renderSensors();
+}
+function startSensor(name, gestureCtx){
+  if(!SENS[name]) throw new Error('O sensor "'+name+'" não existe. Use: som, movimento, inclinacao, luz, local ou toque.');
+  if(live[name]) return;
+  const L = live[name] = {mode:"wait", value: SENS[name].sim, simValue: SENS[name].sim, hist:[], why:"", cleanup:null, loc:{lat:0,lng:0,precisao:9999}, simOff:0};
+  if(name==="toque"){ L.mode="real"; L.value=0; $("#tap-wrap").hidden=false; renderSensors(); return; }
+  const noApi = (why)=>setSim(name, why);
+  try{
+    if(name==="som"){
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return noApi("Este navegador não libera o microfone. Usando simulação.");
+      const ctx = getAudio();
+      navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}).then(stream=>{
+        if(!live[name]){ stream.getTracks().forEach(t=>t.stop()); return; }
+        const c = ctx || getAudio(); if(!c) return noApi("Sem áudio neste navegador. Usando simulação.");
+        const src = c.createMediaStreamSource(stream); const an = c.createAnalyser(); an.fftSize=2048; src.connect(an);
+        const buf = new Float32Array(an.fftSize);
+        L.read = ()=>{ an.getFloatTimeDomainData(buf); let s=0; for(let i=0;i<buf.length;i++) s+=buf[i]*buf[i]; const rms=Math.sqrt(s/buf.length); const db=20*Math.log10(rms+1e-9)+100; return Math.max(0,Math.min(120,db)); };
+        L.mode="real"; L.cleanup=()=>{ stream.getTracks().forEach(t=>t.stop()); try{src.disconnect();}catch(e){} };
+        renderSensors();
+      }).catch(()=>noApi("Sem permissão para o microfone. Usando simulação."));
+    }
+    else if(name==="movimento" || name==="inclinacao"){
+      const evName = name==="movimento" ? "devicemotion" : "deviceorientation";
+      let got = false;
+      const h = name==="movimento"
+        ? (e)=>{ let mag=null; const a=e.acceleration; if(a && a.x!=null){ mag=Math.sqrt(a.x*a.x+a.y*a.y+a.z*a.z); } else { const g=e.accelerationIncludingGravity; if(g && g.x!=null){ mag=Math.abs(Math.sqrt(g.x*g.x+g.y*g.y+g.z*g.z)-9.81); } } if(mag==null) return; got=true; if(L.mode!=="sim"){ L.raw = Math.max((L.raw||0)*0.8, mag); } }
+        : (e)=>{ if(e.beta==null || e.gamma==null) return; got=true; const b=e.beta*Math.PI/180, g=e.gamma*Math.PI/180; const tilt=Math.acos(Math.max(-1,Math.min(1,Math.cos(b)*Math.cos(g))))*180/Math.PI; if(L.mode!=="sim") L.raw = tilt; };
+      const attach = ()=>{
+        window.addEventListener(evName, h);
+        L.cleanup = ()=>window.removeEventListener(evName, h);
+        L.read = ()=> L.raw==null ? 0 : L.raw;
+        setTimeout(()=>{ if(!live[name]) return; if(got){ L.mode = L.mode==="sim"?"sim":"real"; renderSensors(); } else if(L.mode==="wait") noApi("Este aparelho não mandou dados desse sensor (computador?). Usando simulação."); }, 1500);
+      };
+      const P = name==="movimento" ? window.DeviceMotionEvent : window.DeviceOrientationEvent;
+      if(!P) return noApi("Este navegador não tem esse sensor. Usando simulação.");
+      if(gestureCtx && gestureCtx[name]){
+        gestureCtx[name].then(st=>{ if(st==="granted") attach(); else noApi("Sem permissão para esse sensor. Usando simulação."); }).catch(()=>noApi("Sem permissão para esse sensor. Usando simulação."));
+      } else attach();
+    }
+    else if(name==="luz"){
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return noApi("Este navegador não libera a câmera. Usando simulação.");
+      navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:320},height:{ideal:240}},audio:false}).then(stream=>{
+        if(!live[name]){ stream.getTracks().forEach(t=>t.stop()); return; }
+        const v = $("#cam"); v.srcObject = stream; v.play().catch(()=>{});
+        const cv = $("#camc"); const cx = cv.getContext("2d",{willReadFrequently:true});
+        L.read = ()=>{ if(v.readyState<2) return L.value||0; cx.drawImage(v,0,0,32,24); const d=cx.getImageData(0,0,32,24).data; let s=0; for(let i=0;i<d.length;i+=4) s+=0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2]; return s/(d.length/4)/255*100; };
+        L.mode="real"; L.stream=stream; L.cleanup=()=>{ stream.getTracks().forEach(t=>t.stop()); v.srcObject=null; };
+        renderSensors();
+      }).catch(()=>noApi("Sem permissão para a câmera. Usando simulação."));
+    }
+    else if(name==="local"){
+      if(!navigator.geolocation) return noApi("Este navegador não libera o GPS. Usando simulação.");
+      const id = navigator.geolocation.watchPosition(p=>{
+        if(!live[name] || L.mode==="sim") return;
+        L.loc = {lat:p.coords.latitude, lng:p.coords.longitude, precisao:Math.round(p.coords.accuracy)}; L.mode="real"; L.value=L.loc.precisao; renderSensors();
+      }, ()=>noApi("Sem permissão para o GPS. Usando simulação."), {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
+      L.cleanup = ()=>navigator.geolocation.clearWatch(id);
+    }
+  }catch(e){ noApi("Não deu para ligar o sensor. Usando simulação."); }
+  renderSensors();
+}
+function stopSensors(){
+  Object.keys(live).forEach(n=>{ const L=live[n]; if(L.cleanup){ try{L.cleanup();}catch(e){} } });
+  live = {}; $("#tap-wrap").hidden = true;
+}
+function readSensor(name){
+  name = norm(name);
+  if(!SENS[name]) throw new Error('O sensor "'+name+'" não existe. Use: som, movimento, inclinacao, luz, local ou toque.');
+  if(!live[name]) startSensor(name);
+  const L = live[name];
+  if(name==="local"){
+    if(L.mode==="sim"){ const o=L.simOff/111000; return {lat:+(BASE_LAT+o).toFixed(6), lng:+(BASE_LNG+o*0.6).toFixed(6), precisao:12}; }
+    return {lat:L.loc.lat, lng:L.loc.lng, precisao:L.loc.precisao};
+  }
+  return L.value;
+}
+function avgSensor(name, secs){
+  name = norm(name);
+  readSensor(name);
+  const L = live[name]; const n = Math.max(1, Math.min(300, Math.round((Number(secs)||1)*10)));
+  const h = L.hist.slice(-n); if(!h.length) return L.value;
+  return h.reduce((a,b)=>a+b,0)/h.length;
+}
+function sampleSensors(){
+  Object.keys(live).forEach(n=>{
+    const L = live[n];
+    if(n==="toque"){ L.hist.push(L.value); }
+    else if(n==="local"){ L.value = L.mode==="sim" ? 12 : L.loc.precisao; }
+    else {
+      if(L.mode==="sim") L.value = L.simValue;
+      else if(L.mode==="real" && L.read){ L.value = L.read(); }
+      L.hist.push(L.value);
+    }
+    if(L.hist.length>300) L.hist.shift();
+  });
+}
+
+/* ---------- Bancada: interface dos sensores ---------- */
+function renderSensors(){
+  const root = $("#sensors"); const names = Object.keys(live);
+  if(!names.length){ root.innerHTML = '<div class="empty">Nenhum sensor ligado ainda.</div>'; return; }
+  root.innerHTML = "";
+  names.forEach(n=>{
+    const L = live[n], D = SENS[n];
+    const row = document.createElement("div"); row.className="srow";
+    const left = document.createElement("div"); left.style.minWidth="0";
+    const nm = document.createElement("div"); nm.className="nm"; nm.textContent = D.nome;
+    const val = document.createElement("div"); val.className="val"; val.dataset.val=n;
+    left.appendChild(nm); left.appendChild(val);
+    const tools = document.createElement("div"); tools.className="tools";
+    if(n==="luz" && L.mode==="real" && L.stream){ const pv=document.createElement("video"); pv.className="cam"; pv.muted=true; pv.setAttribute("playsinline",""); pv.autoplay=true; pv.srcObject=L.stream; pv.play().catch(()=>{}); tools.appendChild(pv); }
+    const bd = document.createElement("span"); bd.className = "badge " + (L.mode==="real"?"real":L.mode==="sim"?"sim":"wait");
+    bd.textContent = L.mode==="real" ? "Real" : L.mode==="sim" ? "Simulado" : "Ligando";
+    tools.appendChild(bd);
+    if(n!=="toque" && L.mode==="real"){ const sb=document.createElement("button"); sb.type="button"; sb.className="btn ghost sm"; sb.textContent="Simular"; sb.addEventListener("click",()=>setSim(n,"Simulação ligada por você para testar.")); tools.appendChild(sb); }
+    row.appendChild(left); row.appendChild(tools);
+    if(L.mode==="sim" && n!=="toque"){
+      const r = document.createElement("input"); r.type="range"; r.id="sim_"+n; r.setAttribute("aria-label","Simular "+D.nome);
+      if(n==="local"){ r.min=0; r.max=500; r.step=5; r.value=L.simOff; r.addEventListener("input",()=>{ L.simOff=Number(r.value); }); }
+      else { r.min=D.min; r.max=D.max; r.step=D.step; r.value=L.simValue; r.addEventListener("input",()=>{ L.simValue=Number(r.value); }); }
+      row.appendChild(r);
+      const w = document.createElement("div"); w.className="why"; w.textContent = (L.why||"Simulação.") + (n==="local" ? " Arraste para \"andar\" pela rua." : " Arraste para imitar o sensor."); row.appendChild(w);
+    }
+    root.appendChild(row);
+  });
+  updateSensorVals();
+}
+function updateSensorVals(){
+  $$("#sensors [data-val]").forEach(el=>{
+    const n = el.dataset.val, L = live[n]; if(!L) return;
+    if(n==="local"){ const p = readSensor("local"); el.textContent = p.precisao>=9999 ? "procurando sinal…" : p.lat.toFixed(5)+", "+p.lng.toFixed(5)+" · ±"+p.precisao+" m"; }
+    else if(n==="toque") el.textContent = L.value+" toques";
+    else el.textContent = fmt(L.value)+(SENS[n].un?" "+SENS[n].un:"");
+  });
+}
+function fmt(v){ if(typeof v!=="number"||!isFinite(v)) return String(v); const a=Math.abs(v); return a>=100? v.toFixed(0) : a>=10 ? v.toFixed(1) : v.toFixed(2); }
+$("#tap").addEventListener("click",()=>{ const L=live.toque; if(!L) return; L.value++; $("#tap-n").textContent = L.value + (L.value===1?" toque":" toques"); if(navigator.vibrate){ try{navigator.vibrate(30);}catch(e){} } });
+
+/* ---------- Bancada: saídas ---------- */
+let readouts = {}; let statusNow = "parado"; let lastStatusMsg = ""; let lastBeep = 0; let lastLog = {}; let counters = {};
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function setReadout(label, value, unit){
+  label = String(label==null?"Valor":label).slice(0,40);
+  let R = readouts[label];
+  if(!R){
+    if(Object.keys(readouts).length>=8) return;
+    const root=$("#readouts"); const em=$("#ro-empty"); if(em) em.remove();
+    const el=document.createElement("div"); el.className="ro";
+    el.innerHTML='<span class="k"></span><span class="v"></span><canvas width="240" height="68" aria-hidden="true"></canvas>';
+    el.querySelector(".k").textContent=label; root.appendChild(el);
+    R = readouts[label] = {el, hist:[], unit:""};
+  }
+  R.unit = unit==null?"":String(unit).slice(0,12);
+  R.value = value;
+  if(typeof value==="number" && isFinite(value)){ R.hist.push(value); if(R.hist.length>150) R.hist.shift(); }
+}
+function drawReadouts(){
+  const lineC = cssVar("--placa")||"#1c3f94", gridC = cssVar("--line")||"#ddd";
+  Object.values(readouts).forEach(R=>{
+    const v = R.el.querySelector(".v");
+    v.textContent = (typeof R.value==="number") ? fmt(R.value) : String(R.value);
+    if(R.unit){ const s=document.createElement("small"); s.textContent=R.unit; v.appendChild(s); }
+    const cv = R.el.querySelector("canvas"); const c = cv.getContext("2d"); const W=cv.width, H=cv.height;
+    c.clearRect(0,0,W,H);
+    c.strokeStyle=gridC; c.lineWidth=1; c.beginPath(); c.moveTo(0,H-1); c.lineTo(W,H-1); c.stroke();
+    const h=R.hist; if(h.length<2) return;
+    let mn=Math.min(...h), mx=Math.max(...h); if(mx-mn<1e-6){ mx=mn+1; mn=mn-1; }
+    const x=i=> i/(150-1)*W, y=val=> H-4-(val-mn)/(mx-mn)*(H-8);
+    c.beginPath(); h.forEach((val,i)=>{ const px=x(i+150-h.length), py=y(val); i?c.lineTo(px,py):c.moveTo(px,py); });
+    c.strokeStyle=lineC; c.lineWidth=2.5; c.lineJoin="round"; c.stroke();
+    const lx=x(149), ly=y(h[h.length-1]); c.fillStyle=lineC; c.beginPath(); c.arc(lx-3,ly,3.5,0,Math.PI*2); c.fill();
+  });
+}
+function beep(freq, ms){
+  const c = getAudio(); if(!c) return;
+  try{ const o=c.createOscillator(), g=c.createGain(); o.type="square"; o.frequency.value=Number(freq)||880; g.gain.value=0.06; o.connect(g); g.connect(c.destination); const t=c.currentTime; o.start(t); g.gain.setValueAtTime(0.06,t); g.gain.exponentialRampToValueAtTime(0.0001,t+(Number(ms)||180)/1000); o.stop(t+(Number(ms)||180)/1000+0.02); }catch(e){}
+}
+function vib(ms){ if(navigator.vibrate){ try{ navigator.vibrate(Math.min(2000, Number(ms)||200)); }catch(e){} } }
+function setStatus(kind, msg){
+  const now = performance.now();
+  if(kind==="alerta"){
+    if(statusNow!=="alerta" || now-lastBeep>3000){ beep(880,220); setTimeout(()=>beep(660,220),240); vib(300); lastBeep=now; }
+  }
+  const m = msg ? String(msg).slice(0,140) : "";
+  if(kind===statusNow && m===lastStatusMsg) return;
+  statusNow = kind; lastStatusMsg = m;
+  const box=$("#status");
+  box.className = "status "+kind;
+  $("#st-t").textContent = kind==="alerta"?"Alerta":kind==="aviso"?"Atenção":kind==="normal"?"Normal":kind==="erro"?"Erro":"Parado";
+  $("#st-m").textContent = m || (kind==="normal" ? "Tudo dentro do esperado." : "");
+}
+function logEvent(ev, val){
+  ev = String(ev==null?"evento":ev).slice(0,40);
+  const now = Date.now();
+  if(lastLog[ev] && now-lastLog[ev]<2000) return;
+  lastLog[ev]=now;
+  const e = {t:now, ev, v: val==null ? "" : String(val).slice(0,60)};
+  const L = live.local; if(L){ const p=readSensor("local"); if(p.precisao<9999) e.loc = p.lat.toFixed(5)+", "+p.lng.toFixed(5); }
+  S.events.push(e); if(S.events.length>300) S.events.shift();
+  save(); renderLog();
+}
+function renderLog(){
+  const ul=$("#log"); const ev=S.events;
+  $("#log-n").textContent = ev.length + (ev.length===1?" anotação":" anotações");
+  if(!ev.length){ ul.innerHTML='<li class="empty" style="display:block">O que o programa anotar com <code>registrar()</code> aparece aqui, com hora e local.</li>'; return; }
+  ul.innerHTML="";
+  ev.slice(-60).reverse().forEach(e=>{
+    const li=document.createElement("li");
+    const tm=document.createElement("time"); tm.textContent=new Date(e.t).toLocaleTimeString("pt-BR");
+    const d=document.createElement("div"); d.className="ev";
+    const b=document.createElement("b"); b.textContent=e.ev; d.appendChild(b);
+    if(e.v!=="") d.appendChild(document.createTextNode(" · "+e.v));
+    if(e.loc){ const s=document.createElement("div"); s.className="small muted"; s.textContent="GPS "+e.loc; d.appendChild(s); }
+    li.appendChild(tm); li.appendChild(d); ul.appendChild(li);
+  });
+}
+function count(name){
+  name=String(name==null?"contador":name).slice(0,30);
+  counters[name]=(counters[name]||0)+1;
+  setReadout("Contador: "+name, counters[name], "");
+  return counters[name];
+}
+
+/* ---------- Bancada: execução ---------- */
+let timer=null, prog=null, t0=0, curCode="";
+const API_NAMES = ["ligar","ler","media","segundos","agora","mostrar","alerta","aviso","normal","registrar","contar","apitar","vibrar"];
+function buildApi(){
+  return {
+    ligar:(n)=>startSensor(norm(n)),
+    ler:(n)=>readSensor(n),
+    media:(n,s)=>avgSensor(n,s),
+    segundos:()=> (performance.now()-t0)/1000,
+    agora:()=> new Date().toLocaleTimeString("pt-BR"),
+    mostrar:(r,v,u)=>setReadout(r,v,u),
+    alerta:(m)=>setStatus("alerta",m),
+    aviso:(m)=>setStatus("aviso",m),
+    normal:()=>setStatus("normal"),
+    registrar:(e,v)=>logEvent(e,v),
+    contar:(n)=>count(n),
+    apitar:(f,ms)=>beep(f||1046,ms||150),
+    vibrar:(ms)=>vib(ms)
+  };
+}
+function detectSensors(code){
+  const found = new Set(); const re = /(?:ligar|ler|media)\s*\(\s*["'`]([^"'`]+)["'`]/g; let m;
+  while((m=re.exec(code))){ const n=norm(m[1]); if(SENS[n]) found.add(n); }
+  return Array.from(found);
+}
+function translateErr(err){
+  const msg = String(err && err.message || err);
+  let m;
+  if((m = msg.match(/^(\S+) is not defined/)) || (m = msg.match(/Can't find variable: (\S+)/))) return '"'+m[1]+'" não existe. Pode ser erro de digitação ou uma função que a bancada não tem.';
+  if(/Unexpected end of input|Unexpected EOF/i.test(msg)) return "O código acabou antes da hora: falta fechar uma chave } ou um parêntese ).";
+  if(/missing \) after|missing \} after|missing \] after|Expected token|expected expression|Unterminated string|unterminated/i.test(msg)) return "Erro de escrita no código: falta fechar um parêntese ), uma chave } ou umas aspas.";
+  if(/Unexpected token|Unexpected identifier|Unexpected string|Unexpected number|Invalid or unexpected token|Unexpected keyword/i.test(msg)) return "Erro de escrita no código: tem um símbolo fora do lugar (parênteses, chaves, aspas ou vírgula).";
+  if(/Cannot read propert|undefined is not an object|null is not an object/i.test(msg)) return "O programa tentou usar algo que ainda não existe.";
+  if(/is not a function/i.test(msg)) return "O programa chamou como função algo que não é uma função da bancada.";
+  if(/não existe/.test(msg)) return msg;
+  return "O programa parou com um erro.";
+}
+function errLine(err){
+  const st = String(err && err.stack || "");
+  const m = st.match(/<anonymous>:(\d+):(\d+)/);
+  if(m){ const ln = Number(m[1])-2; if(ln>=1) return ln; }
+  return null;
+}
+let lastErrText = "";
+function showError(err, phase){
+  const pt = translateErr(err); const ln = phase==="compile" ? null : errLine(err);
+  const raw = String(err && err.message || err);
+  $("#errbox").hidden=false;
+  $("#err-title").textContent = phase==="compile" ? "O código tem um erro de escrita" : "O programa travou";
+  $("#err-pt").textContent = pt + (ln ? " Perto da linha "+ln+"." : "");
+  $("#err-raw").textContent = raw + (ln ? " (linha "+ln+")" : "");
+  setStatus("erro", "Veja o erro abaixo e peça ajuda à IA.");
+  lastErrText = "A bancada do laboratório deu este erro:\n" + raw + (ln ? " (linha "+ln+")" : "") + "\nEm português: " + pt + "\n\nMeu código era:\n" + curCode + "\n\nExplique em uma frase o que causou o erro e mande o código corrigido inteiro, usando só as funções da bancada.";
+  S.errPending = true; save();
+}
+function resetBenchView(){
+  $("#errbox").hidden = true;
+  readouts = {}; $("#readouts").innerHTML = '<div class="empty" style="grid-column:1/-1" id="ro-empty">Os valores aparecem aqui quando o programa usa <code>mostrar()</code>.</div>';
+  setStatus("parado","Toque em Rodar. O celular vai pedir permissão para usar os sensores.");
+  renderLog(); renderCounts();
+}
+function renderCounts(){ $("#ver-n").textContent=S.versions; $("#errs-n").textContent=S.errors; }
+function stopRun(keepStatus){
+  if(timer){ clearInterval(timer); timer=null; }
+  prog=null; stopSensors(); renderSensors();
+  $("#btn-run").disabled=false; $("#btn-stop").disabled=true;
+  if(!keepStatus && statusNow!=="erro") setStatus("parado","Programa parado. Toque em Rodar para começar de novo.");
+}
+$("#btn-stop").addEventListener("click",()=>stopRun(false));
+$("#btn-run").addEventListener("click",()=>{
+  stopRun(true);
+  const code = cleanCode(S.code);
+  curCode = code;
+  const used = detectSensors(code);
+  // Permissões que precisam do toque (iPhone)
+  const gesture = {};
+  getAudio();
+  try{ if(used.includes("movimento") && window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission==="function") gesture.movimento = DeviceMotionEvent.requestPermission(); }catch(e){}
+  try{ if(used.includes("inclinacao") && window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission==="function") gesture.inclinacao = DeviceOrientationEvent.requestPermission(); }catch(e){}
+  $("#errbox").hidden = true;
+  readouts = {}; counters = {}; lastLog = {};
+  $("#readouts").innerHTML = '<div class="empty" style="grid-column:1/-1" id="ro-empty">Os valores aparecem aqui quando o programa usa <code>mostrar()</code>.</div>';
+  const h = hash(code);
+  if(h!==S.lastHash){ S.versions++; S.lastHash=h; }
+  S.runs++; S.sensorsUsed = Array.from(new Set(S.sensorsUsed.concat(used)));
+  let fn;
+  try{
+    fn = new Function(...API_NAMES, code + "\n;return {configurar: (typeof configurar==='function') ? configurar : null, repetir: (typeof repetir==='function') ? repetir : null};");
+  }catch(err){ save(); renderCounts(); showError(err,"compile"); return; }
+  const api = buildApi();
+  t0 = performance.now();
+  used.forEach(n=>{ try{ startSensor(n, gesture); }catch(e){} });
+  try{
+    prog = fn(...API_NAMES.map(k=>api[k]));
+    if(!prog.repetir && !prog.configurar) throw new Error("O código não tem as funções configurar() e repetir(). Peça à IA para seguir a referência da bancada.");
+    if(prog.configurar) prog.configurar();
+  }catch(err){ stopRun(true); save(); renderCounts(); showError(err,"run"); return; }
+  if(S.errPending){ S.errors++; S.errPending=false; }
+  S.lastSensors = used;
+  save(); renderCounts();
+  setStatus("normal","Programa rodando.");
+  $("#btn-run").disabled=true; $("#btn-stop").disabled=false;
+  let frame=0;
+  timer = setInterval(()=>{
+    sampleSensors();
+    try{ if(prog && prog.repetir) prog.repetir(); }
+    catch(err){ stopRun(true); showError(err,"run"); return; }
+    drawReadouts();
+    if(++frame%3===0) updateSensorVals();
+  },100);
+  renderSensors();
+});
+$("#btn-copy-err").addEventListener("click",()=>copyText(lastErrText,"Erro copiado. Cole na conversa com a IA."));
+$("#btn-bench-done").addEventListener("click",()=>{ stopRun(false); if(!S.t.bench) S.t.bench=Date.now(); save(); go(5); });
+
+/* ---------- Estação 5 ---------- */
+function fillTeste(){
+  $("#t-ver").textContent=S.versions; $("#t-err").textContent=S.errors; $("#t-ev").textContent=S.events.length;
+}
+$$("input[name=ok]").forEach(r=>{ r.checked=r.value===S.teste.ok; r.addEventListener("change",()=>{S.teste.ok=r.value; save();}); });
+$$("input[name=ia]").forEach(r=>{ r.checked=r.value===S.teste.ia; r.addEventListener("change",()=>{S.teste.ia=r.value; save();}); });
+$("#explica").value=S.teste.explica;
+$("#explica").addEventListener("input",e=>{ S.teste.explica=e.target.value; save(); });
+$("#btn-arduino").addEventListener("click",()=>{
+  copyText("Agora traduza este programa da bancada para Arduino, usando uma placa ESP32 e o sensor físico equivalente ao sensor do celular. Mostre o código completo, o esquema de ligação dos fios em passos numerados e a lista de peças com preço aproximado no Brasil.\n\nPrograma:\n"+cleanCode(S.code), "Pedido copiado. Cole na conversa com a IA.");
+});
+$("#btn-teste").addEventListener("click",()=>{
+  const ok = S.teste.ok && S.teste.ia && S.teste.explica.trim().length>=10;
+  $("#teste-err").hidden=!!ok; if(!ok) return;
+  if(!S.t.teste) S.t.teste=Date.now();
+  go(6);
+});
+
+/* ---------- Estação 6 ---------- */
+buildLikert("lik-pos","pos",S.pos.r);
+$("#mudou").value=S.pos.mudou;
+$("#mudou").addEventListener("input",e=>{ S.pos.mudou=e.target.value; save(); });
+$("#btn-pos").addEventListener("click",()=>{
+  const ok = S.pos.r.every(v=>v>0);
+  $("#pos-err").hidden=!!ok; if(!ok) return;
+  S.t.end = Date.now(); go(7);
+});
+
+/* ---------- Resultado ---------- */
+const SNAME = {som:"Som",movimento:"Movimento",inclinacao:"Inclinação",luz:"Luz",local:"GPS",toque:"Toque"};
+function b64e(str){ const bytes=new TextEncoder().encode(str); let bin=""; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function b64d(s){ s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; const bin=atob(s); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); }
+function payload(){
+  const exMatch = EXAMPLES.find(e=>cleanCode(e.code)===cleanCode(S.code));
+  return {v:1, d:new Date(S.t.end||Date.now()).toISOString().slice(0,10),
+    b:S.pre.bairro.trim().slice(0,40), fx:S.pre.faixa, xp:S.pre.exp, m:S.pre.modo,
+    p:S.diag.problema.trim().slice(0,90), s:S.diag.sensor, su:(S.lastSensors&&S.lastSensors.length?S.lastSensors:S.sensorsUsed), tr:S.sensorsUsed,
+    ok:S.teste.ok, ia:S.teste.ia, ver:S.versions, er:S.errors, ev:S.events.length, ex: exMatch?exMatch.id:"",
+    mt:minutes(S.t.start,S.t.end), md:minutes(S.t.start,S.t.diag), mp:minutes(S.t.diag,S.t.prog), mb:minutes(S.t.prog,S.t.bench),
+    pre:S.pre.r, pos:S.pos.r, x:S.teste.explica.trim().slice(0,220), mu:S.pos.mudou.trim().slice(0,220)};
+}
+function resultText(){
+  const P = payload(); const okTxt = {sim:"sim",parcial:"mais ou menos",nao:"não"}[P.ok]||"";
+  return "Laboratório Carioca de Automação Cidadã · resultado\n" +
+    "Bairro: "+P.b+"\nProblema: "+P.p+"\nSensores: "+(P.su.map(s=>SNAME[s]||s).join(", ")||P.s)+
+    "\nFuncionou: "+okTxt+"\nVersões do programa: "+P.ver+" · Tempo: "+P.mt+" min\n" +
+    "Código: LC1."+b64e(JSON.stringify(P));
+}
+function fillResult(){
+  const P = payload();
+  $("#c-bairro").textContent = P.b || "—";
+  $("#c-prob").textContent = P.p;
+  const sens = P.su.length ? P.su.map(s=>SNAME[s]||s).join(" + ") : (SNAME[P.s]||P.s);
+  $("#c-s1").textContent = "sensor de "+sens.toLowerCase();
+  $("#c-s2").textContent = "regra escrita no código";
+  $("#c-s3").textContent = "alerta no celular";
+  $("#c-s4").textContent = P.ev ? P.ev+" anotações" : "registro com hora";
+  $("#c-min").textContent = P.mt+" min";
+  $("#c-ver").textContent = P.ver+(P.ver===1?" versão":" versões");
+  $("#c-ok").textContent = {sim:"Funcionou",parcial:"Funcionou em parte",nao:"Em ajuste"}[P.ok]||"";
+  const txt = resultText();
+  $("#res-text").textContent = txt;
+  $("#btn-wa").href = "https://wa.me/?text="+encodeURIComponent(txt);
+  try{ const all = JSON.parse(localStorage.getItem("lcac_resultados")||"[]"); const code=txt.split("Código: ")[1]; if(!all.includes(code)){ all.push(code); localStorage.setItem("lcac_resultados", JSON.stringify(all)); } }catch(e){}
+}
+$("#btn-copy-res").addEventListener("click",()=>copyText($("#res-text").textContent,"Resultado copiado"));
+$("#btn-again").addEventListener("click",()=>{
+  const keep = {consent:S.consent, pre:S.pre};
+  S = Object.assign(blank(), keep, {step:2, maxStep:2, t:Object.assign(blank().t,{start:Date.now()})});
+  S.pre.r = S.pre.r.slice();
+  save(); location.reload();
+});
+let resetArm = 0;
+$("#btn-reset").addEventListener("click",(e)=>{
+  const now = Date.now();
+  if(now-resetArm>4000){ resetArm=now; e.target.textContent="Toque de novo para apagar tudo"; setTimeout(()=>{ e.target.textContent="Novo participante neste aparelho"; },4000); return; }
+  try{ localStorage.removeItem(KEY); }catch(err){}
+  location.reload();
+});
+
+/* ---------- Painel ---------- */
+function parseCodes(text){
+  const out=[]; const seen=new Set(); const re=/LC1\.([A-Za-z0-9_-]{10,})/g; let m;
+  while((m=re.exec(text))){ if(seen.has(m[1])) continue; seen.add(m[1]); try{ const o=JSON.parse(b64d(m[1])); if(o && o.v===1 && Array.isArray(o.pre) && Array.isArray(o.pos)) out.push(o); }catch(e){} }
+  return out;
+}
+function mean(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+function wilcoxon(pre, pos){
+  const d = pre.map((v,i)=>pos[i]-v).filter(x=>x!==0);
+  const n = d.length; if(n<1) return {n:0,p:null,w:0};
+  const abs = d.map((x,i)=>({a:Math.abs(x),s:Math.sign(x),i})).sort((p,q)=>p.a-q.a);
+  const ranks = new Array(n); let i=0;
+  while(i<n){ let j=i; while(j+1<n && abs[j+1].a===abs[i].a) j++; const r=(i+j+2)/2; for(let k=i;k<=j;k++) ranks[k]=r; i=j+1; }
+  let wPlus=0; abs.forEach((o,k)=>{ if(o.s>0) wPlus+=ranks[k]; });
+  const r2 = ranks.map(r=>Math.round(r*2)); const total = r2.reduce((a,b)=>a+b,0);
+  let dp = new Array(total+1).fill(0); dp[0]=1;
+  r2.forEach(r=>{ for(let s=total; s>=r; s--) dp[s]+=dp[s-r]; });
+  const all = Math.pow(2,n); const w2 = Math.round(wPlus*2);
+  let le=0, ge=0; for(let s=0;s<=total;s++){ if(s<=w2) le+=dp[s]; if(s>=w2) ge+=dp[s]; }
+  const p = Math.min(1, 2*Math.min(le,ge)/all);
+  return {n, p, w:wPlus};
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function fmtP(p){ return p<0.001 ? "&lt;0,001" : p.toFixed(3).replace(".",","); }
+function prePosChart(rows){
+  return '<div class="pp" role="img" aria-label="Média antes e depois por pergunta, escala de 1 a 5"><div class="pp-legend small muted"><span class="pp-dot a"></span>antes<span class="pp-dot b"></span>depois</div>' +
+    rows.map(r=>{
+      const pa=(r.a-1)/4*100, pb=(r.b-1)/4*100, lo=Math.min(pa,pb), hi=Math.max(pa,pb), dl=r.b-r.a;
+      return '<div><div class="pp-head"><span>'+esc(r.label)+'</span><span class="mono">'+r.a.toFixed(1).replace(".",",")+' → '+r.b.toFixed(1).replace(".",",")+' ('+(dl>=0?"+":"")+dl.toFixed(1).replace(".",",")+')'+(r.p!=null?' · p='+fmtP(r.p):'')+'</span></div>'+
+        '<div class="pp-track"><span class="pp-bar" style="left:'+lo+'%;width:'+(hi-lo)+'%"></span><span class="pp-dot a" style="left:'+pa+'%"></span><span class="pp-dot b" style="left:'+pb+'%"></span></div></div>';
+    }).join("") + '<div class="pp-axis"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div>';
+}
+function barList(map, total){
+  const ent = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  if(!ent.length) return '<p class="muted small">Sem dados.</p>';
+  return '<div class="stack" style="gap:8px">'+ent.map(([k,v])=>'<div><div class="row between small"><span>'+esc(k)+'</span><span class="mono">'+v+'</span></div><div style="height:8px;border-radius:4px;background:var(--line);overflow:hidden"><div style="height:100%;width:'+(v/total*100)+'%;background:var(--placa)"></div></div></div>').join("")+'</div>';
+}
+function renderPanel(list, isDemo){
+  const out=$("#pn-out");
+  if(!list.length){ out.innerHTML='<div class="card empty">Nenhum código LC1 encontrado no texto colado. Confira se as mensagens vieram inteiras.</div>'; return; }
+  const n=list.length;
+  const bairros = new Set(list.map(r=>r.b.toLowerCase().trim()).filter(Boolean));
+  const okN = list.filter(r=>r.ok==="sim").length, parN = list.filter(r=>r.ok==="parcial").length;
+  const iaP = list.filter(r=>r.ia==="percebi").length, iaD=list.filter(r=>r.ia==="depois").length;
+  const fromEx = list.filter(r=>r.ex).length;
+  const rows = QS_SHORT.map((lab,i)=>{ const a=list.map(r=>r.pre[i]), b=list.map(r=>r.pos[i]); const w=wilcoxon(a,b); return {label:lab, a:mean(a), b:mean(b), p: n>=5 ? w.p : null}; });
+  const sensMap={}; list.forEach(r=>{ (r.su&&r.su.length?r.su:[r.s]).forEach(s=>{ const k=SNAME[s]||s||"?"; sensMap[k]=(sensMap[k]||0)+1; }); });
+  const xpMap={}; list.forEach(r=>{ const k={nunca:"Nunca mexeu",pouco:"Um pouco",sim:"Já mexia"}[r.xp]||"?"; xpMap[k]=(xpMap[k]||0)+1; });
+  const pct = v=> Math.round(v/n*100)+"%";
+  let h = '';
+  if(isDemo) h+='<div class="warn"><b>Dados de exemplo, fictícios.</b> Servem só para ver como o painel funciona. Não use em apresentação. Cole as mensagens reais para substituir.</div>';
+  h+='<div class="kpis">'+
+    '<div class="kpi"><div class="k">Participantes</div><div class="v">'+n+'</div></div>'+
+    '<div class="kpi"><div class="k">Bairros diferentes</div><div class="v">'+bairros.size+'</div></div>'+
+    '<div class="kpi"><div class="k">Protótipos que funcionaram</div><div class="v">'+pct(okN)+'</div></div>'+
+    '<div class="kpi"><div class="k">Tempo médio (min)</div><div class="v">'+Math.round(mean(list.map(r=>r.mt)))+'</div></div>'+
+    '<div class="kpi"><div class="k">Versões por pessoa</div><div class="v">'+mean(list.map(r=>r.ver)).toFixed(1).replace(".",",")+'</div></div>'+
+    '<div class="kpi"><div class="k">Perceberam erro da IA na hora</div><div class="v">'+pct(iaP)+'</div></div>'+
+  '</div>';
+  h+='<p class="small muted">Funcionou: '+okN+' · em parte: '+parN+' · não: '+(n-okN-parN)+'. IA errou e só perceberam depois: '+iaD+'. Partiram de um exemplo sem mudar o código: '+fromEx+'. Tempo médio por fase: diagnóstico '+Math.round(mean(list.map(r=>r.md)))+' min, programa '+Math.round(mean(list.map(r=>r.mp)))+' min, bancada '+Math.round(mean(list.map(r=>r.mb)))+' min.</p>';
+  h+='<div class="card stack"><h3>Antes e depois (média, escala 1 a 5)</h3><div class="chart">'+prePosChart(rows)+'</div><p class="small muted">'+(n>=5?'p = teste de Wilcoxon pareado, exato. ':'Com menos de 5 participantes o teste estatístico não é calculado. ')+'Amostra pequena, sem grupo de controle: leia como contribuição do laboratório, não como prova de causa.</p></div>';
+  h+='<div class="card stack"><h3>Sensores usados</h3>'+barList(sensMap,n)+'</div>';
+  h+='<div class="card stack"><h3>Experiência anterior</h3>'+barList(xpMap,n)+'</div>';
+  h+='<div class="stack"><h3>Protótipos</h3><div class="tbl-wrap"><table><thead><tr><th>Bairro</th><th>Problema</th><th>Sensor</th><th>Funcionou</th><th>Versões</th><th>Min</th></tr></thead><tbody>'+
+    list.map(r=>'<tr><td>'+esc(r.b)+'</td><td>'+esc(r.p)+'</td><td>'+esc((r.su&&r.su.length?r.su:[r.s]).map(s=>SNAME[s]||s).join(", "))+'</td><td>'+esc({sim:"sim",parcial:"em parte",nao:"não"}[r.ok]||"")+'</td><td class="mono">'+r.ver+'</td><td class="mono">'+r.mt+'</td></tr>').join("")+
+    '</tbody></table></div></div>';
+  const quotes = list.filter(r=>r.x).slice(0,12);
+  if(quotes.length) h+='<div class="stack"><h3>Como funciona, nas palavras de quem fez</h3>'+quotes.map(r=>'<div class="quote">'+esc(r.x)+'<span>'+esc(r.b)+' · '+esc(r.p)+'</span></div>').join("")+'</div>';
+  const mud = list.filter(r=>r.mu).slice(0,12);
+  if(mud.length) h+='<div class="stack"><h3>O que mudou</h3>'+mud.map(r=>'<div class="quote">'+esc(r.mu)+'<span>'+esc(r.b)+'</span></div>').join("")+'</div>';
+  h+='<button class="btn ghost" type="button" id="pn-copy">Copiar resumo em texto</button>';
+  out.innerHTML = h;
+  $("#pn-copy").addEventListener("click",()=>{
+    const lines = ["Laboratório Carioca de Automação Cidadã · resumo das rodadas"+(isDemo?" (EXEMPLO FICTÍCIO)":""),
+      n+" participantes de "+bairros.size+" bairros; "+pct(okN)+" dos protótipos funcionaram ("+okN+" sim, "+parN+" em parte).",
+      "Tempo médio: "+Math.round(mean(list.map(r=>r.mt)))+" min; "+mean(list.map(r=>r.ver)).toFixed(1).replace(".",",")+" versões do programa por pessoa.",
+      pct(iaP)+" perceberam na hora quando a IA errou.",
+      "Antes → depois (média 1 a 5):"].concat(rows.map(r=>"- "+r.label+": "+r.a.toFixed(1).replace(".",",")+" → "+r.b.toFixed(1).replace(".",",")+(r.p!=null?" (p="+r.p.toFixed(3).replace(".",",")+")":"")));
+    copyText(lines.join("\n"),"Resumo copiado");
+  });
+}
+$("#pn-go").addEventListener("click",()=>renderPanel(parseCodes($("#pn-in").value), false));
+$("#pn-demo").addEventListener("click",()=>{
+  const fake = [
+    ["Praça Seca","barulho de baile até tarde","som","sim","percebi",3,1,[1,1,2,3,3,2],[3,3,4,4,4,3],38],
+    ["Vila Valqueire","caminhão fazendo a casa tremer","movimento","sim","nao",2,0,[2,1,2,4,4,2],[4,3,4,4,5,3],31],
+    ["Pavuna","poste apagado na rua de casa","luz","parcial","percebi",4,2,[1,1,1,2,3,1],[3,2,3,3,4,3],44],
+    ["Madureira","ônibus demora demais","toque","sim","depois",2,1,[2,2,3,3,4,2],[4,3,4,4,5,4],29],
+    ["Realengo","rua alaga quando chove","toque","sim","percebi",3,1,[1,2,2,3,4,2],[3,3,4,4,5,4],35],
+    ["Tanque","muro inclinado na encosta","inclinacao","parcial","nao",5,3,[1,1,1,2,3,1],[2,2,3,3,4,2],49]
+  ].map(a=>({v:1,d:"2026-10-14",b:a[0],fx:"18 a 24",xp:"nunca",m:"dupla",p:a[1],s:a[2],su:[a[2]],ok:a[3],ia:a[4],ver:a[5],er:a[6],ev:3,ex:"",mt:a[9],md:9,mp:8,mb:14,pre:a[7],pos:a[8],x:"Exemplo fictício de explicação.",mu:""}));
+  renderPanel(fake, true);
+});
+
+/* ---------- Início ---------- */
+if(S.step===4) S.step = Math.min(S.maxStep,4);
+showView();
+renderLog(); renderCounts();
+})();
+</script>
+</body></html>
