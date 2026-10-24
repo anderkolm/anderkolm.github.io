@@ -935,6 +935,170 @@ h3{font-family:var(--f-body);font-weight:800;letter-spacing:-.005em}
 footer .fbrand{font-family:var(--f-brand);font-stretch:100%;align-items:flex-end}
 footer .fbrand .adc-word{font-size:1.25rem;color:var(--ink)}
 footer .fbrand small{font-family:var(--f-body);font-stretch:100%}
+
+/* ===================== Arte de Construir · camada 2 ===================== */
+@keyframes adc-pop{0%{opacity:0;transform:scale(.2) rotate(var(--r,0deg))}70%{opacity:1;transform:scale(1.12) rotate(var(--r,0deg))}100%{opacity:1;transform:scale(1) rotate(var(--r,0deg))}}
+@keyframes adc-hop2{0%,100%{transform:rotate(var(--r,0deg)) translateY(0)}35%{transform:rotate(calc(var(--r,0deg) + 25deg)) translateY(-26px) scale(1.12)}70%{transform:rotate(calc(var(--r,0deg) - 8deg)) translateY(4px)}}
+@keyframes adc-fall{0%{opacity:0;transform:translateY(-40px)}70%{opacity:1;transform:translateY(5px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes adc-mq{to{transform:translateX(-50%)}}
+
+/* hero preto com peças */
+.adc-hero{position:relative;isolation:isolate;background:#111111;color:#fff;border-radius:30px;margin-top:22px;padding:150px 40px 38px;overflow:hidden}
+.adc-hero > :not(.adc-play){position:relative;z-index:2}
+.adc-hero .eyebrow{color:#111;background:#ff6a1a;align-self:flex-start;border-radius:999px;padding:6px 14px;transform:rotate(-3deg)}
+.adc-hero h1{color:#fff}
+.adc-hero h1 em{color:#ff6a1a}
+.adc-hero h1 em mark{background:#ffd21e;color:#111;border-radius:10px;padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.adc-hero .lead{color:#e6e6e6}
+.adc-hero .btn{background:#ff6a1a;border-color:#ff6a1a;color:#111}
+.adc-hero .btn.ghost{background:transparent;color:#fff;border-color:#fff}
+.adc-hero .stats{border:0;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.adc-hero .stats div{border:0!important;border-radius:18px;padding:12px 14px!important;color:#111;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+.adc-hero .stats div:nth-child(1){background:#ffd21e;transform:rotate(-1.5deg)}
+.adc-hero .stats div:nth-child(2){background:#19c46b;transform:rotate(1deg)}
+.adc-hero .stats div:nth-child(3){background:#b79cff;transform:rotate(1.2deg)}
+.adc-hero .stats div:nth-child(4){background:#ff5fb0;transform:rotate(-1deg)}
+.adc-hero .stats div:hover{transform:rotate(0) translateY(-4px) scale(1.03)}
+.adc-hero .stats span{color:#111;opacity:.82}
+.adc-play{position:absolute;inset:0;z-index:1;pointer-events:none}
+.adc-shape,.adc-play .adc-sticker{position:absolute;pointer-events:auto;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;transform:rotate(var(--r,0deg));animation:adc-pop .6s cubic-bezier(.3,1.4,.5,1) var(--d,0s) both}
+.adc-shape svg{display:block;width:100%;height:auto;pointer-events:none}
+.adc-shape.grab,.adc-play .adc-sticker.grab{cursor:grabbing;z-index:3;filter:drop-shadow(0 12px 14px rgba(0,0,0,.45))}
+.adc-shape.hop,.adc-play .adc-sticker.hop{animation:adc-hop2 .6s cubic-bezier(.3,1.4,.5,1) both}
+.adc-sticker{display:inline-block;font-family:var(--f-brand);font-weight:900;font-size:15px;letter-spacing:.01em;text-transform:uppercase;color:#111;padding:8px 13px;border-radius:12px;border:4px solid #fff;box-shadow:0 0 0 2px #111;white-space:nowrap;transform:rotate(var(--r,0deg))}
+.adc-sticker.g{background:#19c46b}.adc-sticker.y{background:#ffd21e}.adc-sticker.p{background:#ff5fb0}.adc-sticker.o{background:#ff6a1a}
+.adc-tip{position:absolute;left:40px;top:122px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:700}
+@media (max-width:820px){
+  .adc-hero{padding:138px 20px 24px;border-radius:24px;grid-template-columns:1fr}
+  .adc-shape{scale:.6;transform-origin:0 0}
+  .adc-shape:nth-of-type(4),.adc-shape:nth-of-type(8),.adc-shape:nth-of-type(9){display:none}
+  .adc-shape:nth-of-type(1){left:2%!important;top:34px!important}
+  .adc-shape:nth-of-type(2){left:-4%!important;top:68px!important}
+  .adc-shape:nth-of-type(3){left:20%!important;top:14px!important}
+  .adc-shape:nth-of-type(5){left:66%!important;top:66px!important}
+  .adc-shape:nth-of-type(6){left:82%!important;top:22px!important}
+  .adc-shape:nth-of-type(7){left:90%!important;top:76px!important}
+  .adc-play .adc-sticker{font-size:12px;padding:6px 10px;border-width:3px}
+  .adc-play .adc-sticker.g{left:34%!important;top:26px!important}
+  .adc-play .adc-sticker.y{left:47%!important;top:72px!important}
+  .adc-tip{top:110px;left:20px;font-size:.62rem}
+}
+
+/* faixa que corre */
+.adc-mq{margin-top:18px;background:#ff6a1a;color:#111;border-radius:999px;overflow:hidden;transform:rotate(-1.2deg);padding:12px 0}
+.mq-track{display:flex;width:max-content;animation:adc-mq 28s linear infinite}
+.mq-run{display:flex;align-items:center}
+.mq-run span{display:inline-flex;align-items:center;gap:18px;padding-right:18px;font-family:var(--f-brand);font-weight:900;font-size:clamp(1.1rem,2.6vw,1.6rem);text-transform:uppercase;letter-spacing:-.02em;white-space:nowrap}
+.mq-run i{display:inline-block;width:22px;height:22px}
+.mq-run i svg{width:100%;height:100%;display:block}
+.adc-mq:hover .mq-track{animation-play-state:paused}
+
+/* cabeçalhos de seção como adesivo */
+.sec-h .eyebrow{display:inline-block;align-self:flex-start;color:#111;background:#ffd21e;border-radius:999px;padding:5px 13px;transform:rotate(-2.5deg);letter-spacing:.1em}
+.sec:nth-of-type(5n+1) .sec-h .eyebrow{background:#ff6a1a}
+.sec:nth-of-type(5n+2) .sec-h .eyebrow{background:#19c46b}
+.sec:nth-of-type(5n+3) .sec-h .eyebrow{background:#b79cff}
+.sec:nth-of-type(5n+4) .sec-h .eyebrow{background:#ff5fb0}
+.sec.rv .sec-h .eyebrow{opacity:0}
+.sec.rv.in .sec-h .eyebrow{animation:adc-pop .55s cubic-bezier(.3,1.4,.5,1) .05s both;--r:-2.5deg}
+.sec h2{font-family:var(--f-brand);font-weight:900;letter-spacing:-.035em}
+
+/* cartões que pulam */
+.pcard.rv,.book.rv,.lcard.rv{opacity:0;transform:translateY(18px)}
+.pcard.rv.in,.book.rv.in,.lcard.rv.in{opacity:1;transform:none;transition:opacity .45s ease,transform .5s cubic-bezier(.3,1.4,.5,1)}
+.pcard{border-radius:20px;border-width:2px}
+.pcard:hover,.pcard.rv.in:hover{transform:translateY(-5px) rotate(-.8deg);border-color:#ff6a1a}
+.pcard:nth-child(even):hover,.pcard.rv.in:nth-child(even):hover{transform:translateY(-5px) rotate(.8deg)}
+.book{transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.book:hover,.book.rv.in:hover{transform:translateY(-8px) rotate(-2deg)}
+
+/* como funciona em cores */
+.adc-loop{background:transparent;gap:10px;overflow:visible}
+.adc-loop div{border:0!important;border-radius:22px;color:#111;padding:20px 18px;transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
+.adc-loop div:nth-child(1){background:#ffd21e;transform:rotate(-1.5deg)}
+.adc-loop div:nth-child(2){background:#19c46b;transform:rotate(1deg)}
+.adc-loop div:nth-child(3){background:#b79cff;transform:rotate(-1deg)}
+.adc-loop div:nth-child(4){background:#ff6a1a;transform:rotate(1.5deg)}
+.adc-loop div:hover{transform:rotate(0) translateY(-6px)}
+.adc-loop b{font-family:var(--f-brand);font-weight:900;letter-spacing:-.03em}
+.adc-loop span{color:#111;opacity:.85}
+.adc-loop code{display:inline-block;background:#111;color:#fff;border-radius:8px;padding:4px 8px}
+@media (max-width:820px){.adc-loop{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* o nome em blocos de cor */
+.nome{background:transparent;border-radius:0;overflow:visible}
+.nome-grid{gap:10px}
+.nome-grid div{border:0!important;border-radius:22px;color:#111}
+.nome-grid div:nth-child(1){background:#ff6a1a}.nome-grid div:nth-child(2){background:#ffd21e}.nome-grid div:nth-child(3){background:#19c46b}.nome-grid div:nth-child(4){background:#b79cff}
+.nome-grid div b{color:#111!important;font-family:var(--f-brand);font-weight:900;letter-spacing:-.04em;font-size:clamp(1.3rem,3vw,2rem)}
+.nome-grid span{color:#111;opacity:.85}
+.nome-foot{background:#111;color:#fff;border-radius:22px;margin-top:10px;border:0}
+.nome-foot p{font-family:var(--f-brand);font-weight:900}
+@media (max-width:820px){.nome-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* olimpíada com peças */
+.oly-hero{background:#ff5fb0;color:#111;border-radius:26px;padding:26px 22px}
+.oly-hero .big,.oly-hero p{color:#111}
+.oly-hero .eyebrow{color:#111!important}
+.oly-hero .big em{color:#fff;-webkit-text-stroke:0;text-shadow:3px 3px 0 #111}
+.oly-hero::after{border-color:#ffd21e;opacity:1;border-width:18px}
+.oly-hero .btn.ghost{color:#111!important;border-color:#111!important}
+.oly-hero .btn.sinal{background:#111;border-color:#111;color:#fff}
+
+/* conquista */
+.adc-burst{position:fixed;inset:0;pointer-events:none;z-index:60}
+.adc-burst .bp{position:absolute;width:26px;height:26px}
+.adc-burst .bp svg{width:100%;height:100%;display:block}
+.adc-burst .adc-sticker{position:absolute;translate:-50% 0;animation:adc-pop .5s cubic-bezier(.3,1.4,.5,1) both, adc-out .4s ease 1.1s forwards}
+@keyframes adc-out{to{opacity:0;translate:-50% -20px}}
+
+/* aviso, logo e rodapé */
+.toast{background:#111!important;color:#fff!important;border:3px solid #ffd21e;font-family:var(--f-brand);font-weight:700;letter-spacing:.01em;rotate:-1.5deg}
+.adc-word.drop i{animation:adc-fall .55s cubic-bezier(.3,1.4,.5,1) both}
+.adc-word.drop i:nth-child(2){animation-delay:.05s}.adc-word.drop i:nth-child(3){animation-delay:.1s}.adc-word.drop i:nth-child(4){animation-delay:.15s}.adc-word.drop i:nth-child(5){animation-delay:.2s}.adc-word.drop i:nth-child(6){animation-delay:.25s}.adc-word.drop i:nth-child(7){animation-delay:.3s}.adc-word.drop i:nth-child(8){animation-delay:.35s}.adc-word.drop i:nth-child(9){animation-delay:.4s}
+.adc-word.jump i{animation:adc-hop .45s ease both}
+.adc-word.jump i:nth-child(2){animation-delay:.03s}.adc-word.jump i:nth-child(3){animation-delay:.06s}.adc-word.jump i:nth-child(4){animation-delay:.09s}.adc-word.jump i:nth-child(5){animation-delay:.12s}.adc-word.jump i:nth-child(6){animation-delay:.15s}.adc-word.jump i:nth-child(7){animation-delay:.18s}.adc-word.jump i:nth-child(8){animation-delay:.21s}.adc-word.jump i:nth-child(9){animation-delay:.24s}
+.adc-foot{display:flex;gap:12px;align-items:flex-end;margin-bottom:10px}
+.adc-foot i{display:block;width:26px;height:26px;transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.adc-foot i:hover{transform:translateY(-8px) rotate(20deg)}
+.adc-foot .a{background:#2a6bff;border-radius:50%}.adc-foot .b{background:#ff6a1a;border-radius:8px;rotate:12deg}.adc-foot .c{background:#ffd21e;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}.adc-foot .d{background:#19c46b;clip-path:polygon(50% 6%,96% 94%,4% 94%)}.adc-foot .e{background:#ff5fb0;border-radius:999px;width:44px}.adc-foot .f{background:#b79cff;border-radius:50% 50% 8px 8px}
+
+/* modo escuro: o preto do hero ganha borda */
+:root[data-theme="dark"] .adc-hero{box-shadow:inset 0 0 0 1px #2c2c2c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .adc-hero{box-shadow:inset 0 0 0 1px #2c2c2c}}
+
+/* para quem é: faixa de cor por perfil */
+.who-grid article{border-radius:20px;border-top:8px solid #ff6a1a;transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
+.who-grid article:nth-child(6n+2){border-top-color:#ffd21e}.who-grid article:nth-child(6n+3){border-top-color:#19c46b}.who-grid article:nth-child(6n+4){border-top-color:#b79cff}.who-grid article:nth-child(6n+5){border-top-color:#ff5fb0}.who-grid article:nth-child(6n){border-top-color:#2a6bff}
+.who-grid article:hover{transform:translateY(-5px) rotate(-.6deg)}
+.who-grid b{font-family:var(--f-brand);font-weight:800;letter-spacing:-.02em}
+
+.sens{border-radius:16px;border-top:6px solid #ff6a1a}
+.sens:nth-child(6n+2){border-top-color:#ffd21e}.sens:nth-child(6n+3){border-top-color:#19c46b}.sens:nth-child(6n+4){border-top-color:#b79cff}.sens:nth-child(6n+5){border-top-color:#ff5fb0}.sens:nth-child(6n){border-top-color:#2a6bff}
+
+/* estação com cara da marca */
+.st-num{border-radius:16px;transform:rotate(-4deg);font-family:var(--f-brand);font-weight:900;box-shadow:4px 4px 0 #ffd21e}
+.st-title h2{font-family:var(--f-brand);font-weight:900;letter-spacing:-.035em}
+.open-q{border-radius:22px;position:relative;overflow:hidden;padding-right:64px}
+.open-q::after{content:"";position:absolute;right:-14px;top:-14px;width:70px;height:70px;background:var(--lc);opacity:.9;clip-path:polygon(50% 0,56% 30%,78% 8%,66% 36%,96% 30%,72% 50%,96% 70%,66% 64%,78% 92%,56% 70%,50% 100%,44% 70%,22% 92%,34% 64%,4% 70%,28% 50%,4% 30%,34% 36%,22% 8%,44% 30%);animation:adc-spin 18s linear infinite}
+@keyframes adc-spin{to{rotate:360deg}}
+.wbox{border-radius:22px;border-width:3px}
+.prob{border-radius:18px}
+.mc button{border-radius:12px;transition:transform .15s cubic-bezier(.3,1.4,.5,1),border-color .15s}
+.mc button:not(:disabled):hover{transform:translateY(-2px)}
+.done-bar{border-radius:18px;background:#19c46b;color:#111}
+.done-bar b{color:#111;font-family:var(--f-brand);font-weight:900}
+.btn{transition:transform .18s cubic-bezier(.3,1.4,.5,1)}
+.btn:not(:disabled):hover{transform:translateY(-2px) rotate(-1deg)}
+.btn:not(:disabled):active{transform:translateY(1px) scale(.97)}
+.metro{border-radius:24px}
+@media (prefers-reduced-motion: reduce){.open-q::after{animation:none}}
+
+@media (prefers-reduced-motion: reduce){
+  .mq-track{animation:none}
+  .adc-shape,.adc-play .adc-sticker,.sec.rv.in .sec-h .eyebrow,.adc-word.drop i,.adc-word.jump i{animation:none!important}
+  .sec.rv .sec-h .eyebrow,.pcard.rv,.book.rv,.lcard.rv{opacity:1;transform:none}
+}
 </style>
 
   <header class="brandbar">
@@ -1304,6 +1468,7 @@ footer .fbrand small{font-family:var(--f-body);font-stretch:100%}
   </main>
 
   <footer>
+    <div class="adc-foot" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><i class="e"></i><i class="f"></i></div>
     <span class="fbrand"><span class="adc-logo" aria-hidden="true"><span class="adc-pill">Arte de</span><span class="adc-word"><i>C</i><i>O</i><i>N</i><i>S</i><i>T</i><i>R</i><i>U</i><i>I</i><i>R</i></span></span><small>Uma iniciativa do Laboratório Carioca<br>de Automação Cidadã · JCC 2026</small></span>
     <nav><a href="#">Início</a><a href="#lab">Oficina</a><a href="#trilhas">Trilhas</a><a href="#olimpiadas">Olimpíadas</a><a href="#simulado">Simulado</a><a href="#pensadores">Pensadores</a><a href="#biblioteca">Biblioteca</a><a href="#fundamentos">Fundamentos</a><a href="#apoie">Apoie</a><a href="#guia">Guia de IA</a><a href="#painel">Painel do pesquisador</a></nav>
     <span>Construa o que você entende. Escola aberta e gratuita de lógica, matemática, programação, automação, IA, dados e negócios. Nasceu como pesquisa de <a href="https://lattes.cnpq.br/9592947389528765" target="_blank" rel="noopener">Anderson Martins Araújo Pessoa</a> no Programa Jovens Cientistas Cariocas 2026.</span>
@@ -3010,7 +3175,7 @@ function triangular(n) {
 }`},
  deep:[
   {t:"O Homem que Calculava", by:"Malba Tahan (Júlio César de Mello e Souza)", tags:["pt"], nota:"Clássico brasileiro escrito por um carioca. O aniversário dele, 6 de maio, virou o Dia Nacional da Matemática."},
-  {t:"Prealgebra", by:"Richard Rusczyk, David Patrick e Ravi Boppana (AoPS)", tags:[], nota:"Livro da Art of Problem Solving: problema primeiro, teoria depois (em inglês, pago)."},
+  {t:"Prealgebra", by:"Richard Rusczyk, David Patrick e Ravi Boppana", tags:[], nota:"Problema primeiro, teoria depois (em inglês, pago)."},
   {t:"Proofs Without Words", by:"Roger B. Nelsen (MAA)", tags:[], nota:"Coleção de provas feitas só com figuras, como a deste explorador."},
   {t:"Portal da Matemática OBMEP", by:"IMPA", tags:["free","pt"], url:"https://portaldaobmep.impa.br/", nota:"Videoaulas e exercícios gratuitos de matemática, do 6º ano ao ensino médio."}
  ],
@@ -3039,7 +3204,7 @@ station({id:"combinar", line:1, num:"1.4", title:"A roda de combinar ideias", su
    texto:"Filósofo que inventou a “Arte”: discos de papel giratórios, um dentro do outro, com conceitos escritos na borda. Girando os discos, apareciam todas as combinações de ideias. Foi uma das primeiras tentativas de raciocinar com uma máquina. Quase 400 anos depois, inspirou Leibniz a escrever a “Dissertação sobre a arte combinatória” (1666)."}],
  auto:{texto:`Todo protótipo da Bancada é uma combinação: um sensor (SENTIR), uma regra (DECIDIR) e uma ação (AGIR e AVISAR). Contar as combinações mostra quantos problemas do bairro dá para atacar com o mesmo celular.`},
  deep:[
-  {t:"Introduction to Counting & Probability", by:"David Patrick (AoPS)", tags:[], nota:"O livro de contagem mais usado por quem treina para olimpíada (em inglês)."},
+  {t:"Introduction to Counting & Probability", by:"David Patrick", tags:[], nota:"O livro de contagem mais usado por quem treina para olimpíada (em inglês)."},
   {t:"Ramon Llull", by:"Stanford Encyclopedia of Philosophy", tags:["free","src"], url:"https://plato.stanford.edu/entries/llull/", nota:"Vida e obra de Llull, incluindo os discos combinatórios (em inglês)."},
   {t:"Portal da Matemática OBMEP: contagem", by:"IMPA", tags:["free","pt"], url:"https://portaldaobmep.impa.br/", nota:"Procure o módulo de princípio fundamental da contagem."}
  ],
@@ -3230,7 +3395,7 @@ station({id:"euclides", line:2, num:"2.4", title:"Euclides: provar a partir do n
  deep:[
   {t:"Os Elementos de Euclides, edição colorida de Byrne (1847)", by:"Recriação interativa de Nicholas Rougeux", tags:["free","src"], url:"https://www.c82.net/euclid/", nota:"Os Elementos com provas feitas de cores e formas. Lindo e gratuito."},
   {t:"Euclid's Elements", by:"David E. Joyce (Clark University)", tags:["free","src"], url:"https://mathcs.clarku.edu/~djoyce/java/elements/elements.html", nota:"O texto completo com comentários de cada proposição (em inglês)."},
-  {t:"Introduction to Geometry", by:"Richard Rusczyk (AoPS)", tags:[], nota:"Geometria olímpica do básico ao avançado (em inglês)."},
+  {t:"Introduction to Geometry", by:"Richard Rusczyk", tags:[], nota:"Geometria olímpica do básico ao avançado (em inglês)."},
   {t:"GeoGebra", by:"geogebra.org", tags:["free","pt"], url:"https://www.geogebra.org/", nota:"Faça a construção de Euclides você mesmo, com régua e compasso virtuais."}
  ],
  probs:[
@@ -3375,7 +3540,7 @@ mostrar("Instantâneo", instantaneo, "dB");
 mostrar("Média 2 s", estavel, "dB");`},
  deep:[
   {t:"Seeing Theory", by:"Universidade Brown", tags:["free"], url:"https://seeing-theory.brown.edu/", nota:"Probabilidade e estatística ensinadas só com animações interativas."},
-  {t:"Introduction to Counting & Probability", by:"David Patrick (AoPS)", tags:[], nota:"Contagem e probabilidade em nível olímpico (em inglês)."},
+  {t:"Introduction to Counting & Probability", by:"David Patrick", tags:[], nota:"Contagem e probabilidade em nível olímpico (em inglês)."},
   {t:"Khan Academy: probabilidade", by:"Khan Academy em português", tags:["free","pt"], url:"https://pt.khanacademy.org/", nota:"Exercícios com correção automática."},
   {t:"Correspondência de 1654", by:"Pascal e Fermat", tags:["src"], nota:"As cartas que fundaram a probabilidade, reproduzidas em várias histórias da matemática."}
  ],
@@ -3517,7 +3682,6 @@ station({id:"pombos", line:4, num:"4.2", title:"A casa dos pombos", sub:"O princ
  auto:{texto:`Engenharia usa a casa dos pombos o tempo todo. Se o registro da Bancada guarda um evento a cada 2 segundos, em 1 minuto cabem no máximo 30 eventos do mesmo tipo: pombos (eventos) em casas (janelas de 2 s). E qualquer “resumo” de um arquivo grande em poucos bits tem colisões, porque há mais arquivos que resumos possíveis.`},
  deep:[
   {t:"Problem-Solving Strategies, cap. 4: o princípio das caixas", by:"Arthur Engel", tags:[], nota:"Dezenas de problemas olímpicos resolvidos com o princípio."},
-  {t:"Pigeonhole Principle", by:"AoPS Wiki (gratuito)", tags:["free"], url:"https://artofproblemsolving.com/wiki/index.php/Pigeonhole_Principle", nota:"Problemas de competições reais por nível, com discussão (em inglês)."},
   {t:"Portal da Matemática OBMEP", by:"IMPA", tags:["free","pt"], url:"https://portaldaobmep.impa.br/", nota:"Procure o módulo de princípio da casa dos pombos."}
  ],
  probs:[
@@ -5702,8 +5866,6 @@ const BIB = [
  ]},
  {h:"Treino olímpico pesado", it:[
   {t:"Problem-Solving Strategies", by:"Arthur Engel", tags:[], nota:"Invariantes, casa dos pombos, indução, jogos: a bíblia do treino olímpico (em inglês)."},
-  {t:"Série The Art of Problem Solving", by:"Rusczyk, Lehoczky, Patrick e outros (AoPS)", tags:[], nota:"Volume 1 e 2, Prealgebra, Introduction e Intermediate. Problema primeiro, teoria depois (em inglês, pago)."},
-  {t:"AoPS Wiki e Alcumus", by:"artofproblemsolving.com", tags:["free"], url:"https://artofproblemsolving.com/wiki/", nota:"As partes gratuitas da AoPS: enciclopédia de problemas de competição e treino adaptativo (em inglês)."},
   {t:"Revista Eureka!", by:"OBM", tags:["free","pt"], url:"https://www.obm.org.br/", nota:"Artigos de treinamento escritos por medalhistas e professores."}
  ]},
  {h:"Fontes primárias: leia os gênios no original", it:[
@@ -6168,7 +6330,7 @@ function chainEl(){
   return el;
 }
 
-/* ---------- Problemas no estilo AoPS ---------- */
+/* ---------- Problemas com dicas ---------- */
 function parseAns(s){ s = String(s||"").trim().replace(/\s+/g,""); if(!s) return null;
   if(/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(s)) s = s.replace(/\./g,"");
   s = s.replace(",", ".");
@@ -6306,58 +6468,107 @@ function whoSection(){
 }
 const MARK_SVG = '<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="24" fill="#111111"/><path d="M45.6 39.4 A16 16 0 1 0 45.6 64.6" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="butt"/><circle cx="66" cy="57" r="15" fill="none" stroke="#ffffff" stroke-width="11"/><circle cx="20" cy="20" r="9" fill="#ff6a1a"/></svg>';
 function nomeSection(){
-  const P = [["Laboratório","Lugar de testar. Aqui se mede, se erra e se mede de novo. Ninguém decora: comprova."],["Carioca","Nasceu no Rio, com os problemas do Rio: alagamento, encosta, calor, ônibus. E serve para qualquer cidade do mundo."],["Automação","Tecnologia que sente, decide e age sozinha. A mesma lógica de um forno de pizzaria, de um robô industrial e de uma IA."],["Cidadã","Para gente de verdade resolver problema de verdade, em casa, na rua e no trabalho. Aberta e gratuita, para sempre."]];
-  return h("section", {class:"sec"}, secHead("O nome", "Cada palavra é uma promessa", "Como a Art of Problem Solving diz o que faz no próprio nome, este nome também diz."),
+  const P = [["Arte","Ofício que se aprende fazendo. Tem técnica, tem teoria e tem mão na massa. Ninguém decora: pratica até sair bem feito."],["Construir","Sair com uma coisa que funciona: um alarme, um painel, um robô, um modelo. A prova de que você entendeu é ela funcionar."],["Entender","Primeiro o problema, depois a teoria, aí a construção. Quem entende constrói. Quem constrói entende de novo, mais fundo."],["Cinco Artes","Pensar, compreender, inventar, construir e resolver. A Arte de Construir é a primeira a abrir as portas."]];
+  return h("section", {class:"sec"}, secHead("O nome", "Duas palavras, um método", "O nome diz o que você faz aqui: aprende a teoria construindo uma coisa de verdade."),
     h("div", {class:"nome"}, h("div", {class:"nome-grid"}, P.map(([b,t])=>h("div", {}, h("b", {}, b), h("span", {}, t)))),
       h("div", {class:"nome-foot"}, h("span", {class:"mk", html: MARK_SVG + "Arte de Construir"}), h("p", {}, "Construa o que você entende."))));
 }
 function booksSection(){
   const B = [["1","Lógica","A base de tudo: de Aristóteles ao chip","var(--l1)"],["2","Matemática olímpica","Do zero à medalha, problema primeiro","var(--l4)"],["3","Automação com o celular","Sentir, decidir, agir e avisar","#1f5be6"],["4","Dados e negócios","A matemática que decide dinheiro","var(--l6)"]];
-  return h("section", {class:"sec"}, secHead("Coleção", "Livros Arte de Construir", "Livros abertos no espírito da Art of Problem Solving: problema primeiro, teoria depois e solução comentada. Em preparação, com o financiamento coletivo."),
+  return h("section", {class:"sec"}, secHead("Coleção", "Livros Arte de Construir", "Livros abertos: problema primeiro, teoria depois e solução comentada. Em preparação, com o financiamento coletivo."),
     h("div", {class:"books"}, B.map(([n,t,sub,col])=>h("article", {class:"book", style:"--bk:"+col, "aria-label":"Volume "+n+": "+t},
       h("div", {class:"bk-top"}, h("span", {class:"bk-vol"}, "Arte de Construir · Volume "+n), h("span", {class:"bk-t"}, t), h("span", {class:"bk-s"}, sub)),
       h("div", {class:"bk-foot", html: MARK_SVG + "<span><b>Arte de Construir</b>Uma das Cinco Artes</span>"})))));
 }
-function cmpSection(){
-  const rows = [
-    ["Preço","pago (com partes grátis)","grátis","pago","grátis, para sempre"],
-    ["Idioma","inglês","português","inglês","português, aberto ao mundo"],
-    ["Formato","livros, cursos e comunidade","videoaulas e exercícios","livros técnicos","cidade 3D, exploradores, problemas com dicas e oficina"],
-    ["Áreas","matemática olímpica","matemática","programação e tecnologia","lógica, matemática, física, programação, automação, IA, dados e negócios"],
-    ["Sensores do celular","—","—","—","sim, na oficina"],
-    ["IA por voz","—","—","—","sim: entrega o programa pronto e explica"],
-    ["Você sai com","nota e treino","treino e medalha","conhecimento","uma tecnologia funcionando e uma página de projeto"],
-    ["Para quem","alunos que já gostam de matemática","alunos da escola básica","profissionais de tecnologia","do 5º ano ao profissional de qualquer área"]
-  ];
-  return h("section", {class:"sec"}, secHead("Comparativo", "O que já existe, e o que faltava", "A Art of Problem Solving e o Portal da OBMEP são referências mundiais em resolução de problemas. Os livros da O'Reilly ensinam tecnologia a profissionais. O Laboratório junta as três coisas e acrescenta o que nenhuma tem: você constrói uma tecnologia real com o celular."),
-    h("div", {class:"cmp-wrap"}, h("table", {class:"cmp"}, h("tr", {}, h("th", {}, ""), h("th", {}, "AoPS"), h("th", {}, "Portal da OBMEP"), h("th", {}, "Livros O'Reilly"), h("th", {class:"us"}, "Arte de Construir")),
-      rows.map(r=>h("tr", {}, h("td", {}, h("b", {}, r[0])), h("td", {class:r[1]==="—"?"n":""}, r[1]), h("td", {class:r[2]==="—"?"n":""}, r[2]), h("td", {class:r[3]==="—"?"n":""}, r[3]), h("td", {class:"y"}, r[4]))))),
-    h("p", {class:"small muted"}, "A AoPS tem partes gratuitas (Wiki e Alcumus) e o Portal da OBMEP é gratuito e excelente: os dois estão na Biblioteca. A ideia é somar, não substituir."));
-}
 function apoieBand(){
   return h("section", {class:"sec"}, h("div", {class:"apoie"},
-    h("div", {class:"stack"}, h("p", {class:"eyebrow", style:"color:var(--on-sinal)"}, "Financiamento coletivo"), h("p", {class:"big"}, "Uma escola aberta precisa de quem a mantenha aberta."), h("p", {}, "O Laboratório é gratuito e vai continuar gratuito. A campanha de financiamento coletivo está em preparação, para manter a plataforma no ar, imprimir a coleção de livros e crescer.")),
+    h("div", {class:"stack"}, h("p", {class:"eyebrow", style:"color:var(--on-sinal)"}, "Financiamento coletivo"), h("p", {class:"big"}, "Uma escola aberta precisa de quem a mantenha aberta."), h("p", {}, "A Arte de Construir é gratuita e vai continuar gratuita. A campanha de financiamento coletivo está em preparação, para manter a plataforma no ar, imprimir a coleção de livros e crescer.")),
     h("div", {class:"stack"}, h("ul", {}, ["Novas trilhas: física, química e mais IA","Kits de sensores para escolas públicas","Bolsas para monitores e professores","Livros e e-books abertos","Servidor e domínio próprio"].map(t=>h("li", {}, t))),
       h("div", {class:"row"}, h("a", {class:"btn", href:"#apoie"}, "Quero apoiar"), h("button", {type:"button", class:"btn ghost", onclick:()=>ecopy(inviteText(), "Convite copiado. Mande para quem precisa conhecer.")}, "Copiar convite")))));
 }
 function inviteText(){ return "Conhece a Arte de Construir? É uma escola aberta e gratuita de lógica, matemática, automação, IA, dados e negócios. Você constrói uma tecnologia de verdade com os sensores do celular, com uma IA que entrega o programa pronto, e sai com uma página de projeto para o portfólio. Tem trilhas do 5º ano ao profissional de qualquer área e treino para olimpíadas: "+PUBLIC_URL; }
+/* ---------- Arte de Construir · camada viva da marca ---------- */
+const ADC_RM = matchMedia("(prefers-reduced-motion: reduce)");
+const ADC_SHAPES = {
+  dot:c=>`<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="${c}"/></svg>`,
+  arc:c=>`<svg viewBox="0 0 190 110"><path d="M14 14 A80 80 0 0 0 176 14" fill="none" stroke="${c}" stroke-width="28" stroke-linecap="round"/></svg>`,
+  burst:c=>`<svg viewBox="0 0 100 100"><polygon points="50,0 56,30 78,8 66,36 96,30 72,50 96,70 66,64 78,92 56,70 50,100 44,70 22,92 34,64 4,70 28,50 4,30 34,36 22,8 44,30" fill="${c}"/></svg>`,
+  pill:c=>`<svg viewBox="0 0 150 80"><rect width="150" height="80" rx="22" fill="${c}"/></svg>`,
+  tri:c=>`<svg viewBox="0 0 150 120"><path d="M20 100 L75 14 Q80 6 86 14 L136 100 Q140 110 128 110 L28 110 Q14 110 20 100 Z" fill="${c}"/></svg>`,
+  hook:c=>`<svg viewBox="0 0 150 190"><path d="M30 20 A80 80 0 0 1 120 170" fill="none" stroke="${c}" stroke-width="32" stroke-linecap="round"/></svg>`,
+  scallop:c=>`<svg viewBox="0 0 100 100"><polygon points="50,2 61,18 80,12 82,32 98,42 86,58 92,78 72,80 62,98 50,86 38,98 28,80 8,78 14,58 2,42 18,32 20,12 39,18" fill="${c}"/></svg>`,
+  sq:c=>`<svg viewBox="0 0 100 100"><rect x="6" y="6" width="88" height="88" rx="14" fill="${c}"/></svg>`,
+  block:c=>`<svg viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="8" fill="${c}"/><rect x="30" y="30" width="40" height="40" rx="4" fill="#111111"/></svg>`,
+  spark:c=>`<svg viewBox="0 0 100 100"><path d="M50 0 C54 36 64 46 100 50 C64 54 54 64 50 100 C46 64 36 54 0 50 C36 46 46 36 50 0 Z" fill="${c}"/></svg>`
+};
+const ADC_COLS = ["#ff6a1a","#ffd21e","#ff5fb0","#19c46b","#2a6bff","#b79cff"];
+function adcDrag(el, box){
+  let sx=0, sy=0, ox=0, oy=0, moved=false, id=null;
+  el.addEventListener("pointerdown", e=>{ id = e.pointerId; el.setPointerCapture(id); sx = e.clientX; sy = e.clientY; ox = +el.dataset.x||0; oy = +el.dataset.y||0; moved = false; el.classList.add("grab"); });
+  el.addEventListener("pointermove", e=>{ if(e.pointerId!==id) return; const dx = e.clientX-sx, dy = e.clientY-sy; if(Math.abs(dx)+Math.abs(dy) > 4) moved = true; el.dataset.x = ox+dx; el.dataset.y = oy+dy; el.style.translate = (ox+dx)+"px "+(oy+dy)+"px"; });
+  const end = e=>{ if(e.pointerId!==id) return; id = null; el.classList.remove("grab"); if(!moved){ el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); } };
+  el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+  el.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); } });
+}
+function adcPlay(){
+  const box = h("div", {class:"adc-play", "aria-hidden":"true"});
+  const items = [["dot","#2a6bff",3,40,52,0],["arc","#ff6a1a",11,22,140,-14],["burst","#ffd21e",27,26,88,0],["sq","#ff5fb0",39,70,46,12],["tri","#19c46b",68,24,100,-12],["scallop","#b79cff",80,40,76,0],["hook","#ffd21e",91,8,82,18],["dot","#ff6a1a",64,104,30,0],["spark","#ffffff",36,22,34,0]];
+  items.forEach(([k,c,x,y,w,r],i)=>{ const d = h("span", {class:"adc-shape", tabindex:"-1", style:`left:${x}%;top:${y}px;width:${w}px;--r:${r}deg;--d:${(i*.06).toFixed(2)}s`}); d.innerHTML = ADC_SHAPES[k](c); adcDrag(d, box); box.append(d); });
+  [["FUNCIONOU!","g",45,30,-6],["R$ 0","y",58,58,7]].forEach(([t,c,x,y,r],i)=>{ const st = h("span", {class:"adc-sticker "+c, style:`left:${x}%;top:${y}px;--r:${r}deg;--d:${(.7+i*.12).toFixed(2)}s`}, t); adcDrag(st, box); box.append(st); });
+  box.append(h("span", {class:"adc-tip"}, "arraste as peças"));
+  return box;
+}
+function adcMarquee(){
+  const W = ["Lógica","Automação","Sensores","IA","Dados","Olimpíadas","Negócios","Programação","Matemática"];
+  const run = ()=>h("div", {class:"mq-run"}, W.map((w,i)=>h("span", {}, w, h("i", {html: ADC_SHAPES[["burst","dot","sq","tri","spark"][i%5]]("#111111")}))));
+  return h("div", {class:"adc-mq", "aria-hidden":"true"}, h("div", {class:"mq-track"}, run(), run()));
+}
+function adcBurst(el){
+  const r = el.getBoundingClientRect(); const x = r.left + Math.min(r.width, 260)/2, y = r.top + r.height/2;
+  const layer = h("div", {class:"adc-burst", "aria-hidden":"true"}); document.body.append(layer);
+  const words = ["FUNCIONOU!","ACERTOU!","BOA!","MANDOU BEM!","É ISSO!"];
+  const st = h("span", {class:"adc-sticker "+["g","y","p","o"][Math.floor(Math.random()*4)], style:`left:${x}px;top:${y-34}px;--r:${(Math.random()*14-7).toFixed(1)}deg`}, words[Math.floor(Math.random()*words.length)]);
+  layer.append(st);
+  if(!ADC_RM.matches){ const ks = Object.keys(ADC_SHAPES).filter(k=>k!=="arc"&&k!=="hook");
+    for(let i=0;i<16;i++){ const p = h("span", {class:"bp"}); p.innerHTML = ADC_SHAPES[ks[i%ks.length]](ADC_COLS[i%ADC_COLS.length]); p.style.left = x+"px"; p.style.top = y+"px"; layer.append(p);
+      const a = Math.random()*Math.PI*2, d = 70+Math.random()*120;
+      p.animate([{transform:"translate(-50%,-50%) scale(.2) rotate(0deg)", opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*d}px), calc(-50% + ${Math.sin(a)*d - 40}px)) scale(1) rotate(${Math.random()*360-180}deg)`, opacity:1, offset:.7},{transform:`translate(calc(-50% + ${Math.cos(a)*d*1.1}px), calc(-50% + ${Math.sin(a)*d + 30}px)) scale(.9) rotate(${Math.random()*360}deg)`, opacity:0}], {duration:1100+Math.random()*300, easing:"cubic-bezier(.2,.8,.3,1)", fill:"forwards"}); } }
+  setTimeout(()=>layer.remove(), 1600);
+}
+(function adcLive(){
+  const seen = new WeakSet();
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold:.12}) : null;
+  const scan = root=>{ if(!(root instanceof Element)) return;
+    root.querySelectorAll?.(".sec, .pcard, .book, .lcard").forEach(n=>{ if(io && !seen.has(n)){ seen.add(n); n.classList.add("rv"); io.observe(n); } }); };
+  const isWin = n=>n instanceof Element && (n.matches(".fb.ok, .w-msg.ok, .done-bar") );
+  let lastAct = 0; ["pointerdown","keydown"].forEach(t=>addEventListener(t, ()=>{ lastAct = Date.now(); }, true));
+  const fire = n=>{ if(seen.has(n)) return; seen.add(n); if(Date.now()-lastAct < 2500 && n.offsetParent!==null) adcBurst(n); };
+  new MutationObserver(ms=>ms.forEach(m=>{
+    if(m.type==="attributes"){ if(isWin(m.target)) fire(m.target); return; }
+    m.addedNodes.forEach(n=>{ if(!(n instanceof Element)) return; scan(n); if(isWin(n)) fire(n); else n.querySelectorAll(".fb.ok, .w-msg.ok, .done-bar").forEach(fire); });
+  })).observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
+  const logo = document.querySelector(".brandbar .adc-word");
+  if(logo && !ADC_RM.matches){ logo.classList.add("drop"); setTimeout(()=>logo.classList.remove("drop"), 1400); }
+  document.querySelectorAll(".adc-word").forEach(w=>w.addEventListener("pointerdown", ()=>{ w.classList.remove("jump"); void w.offsetWidth; w.classList.add("jump"); }));
+})();
 function renderHome(){
   eroot.classList.add("wide");
   const EX = (window.LCAC && LCAC.EXAMPLES) || [];
   const next = ORDER.find(id=>!stProgress(id).done) || ORDER[0];
   const any = Object.keys(PG.solved).length || Object.keys(PG.visited).length;
-  add(h("section", {class:"hero"},
+  add(h("section", {class:"hero adc-hero"}, adcPlay(),
     h("div", {class:"stack", style:"gap:16px"}, h("p", {class:"eyebrow"}, "Arte de Construir · escola aberta e gratuita"),
       h("h1", {html:"Construa tecnologia de verdade.<em>Seu celular <mark>é o kit.</mark></em>"})),
     h("div", {class:"hero-side"}, h("p", {class:"lead"}, "Construa o que você entende. Letramento técnico e industrial do 5º ano às olimpíadas, do eletricista ao analista de dados. A IA escreve o programa, os sensores do seu bolso medem o mundo e você sai com uma tecnologia funcionando e uma página de projeto para o portfólio."),
       h("div", {class:"row"}, h("a", {class:"btn", href:"#lab"}, "Construir agora"), h("a", {class:"btn ghost", href: any ? "#e."+next : "#trilhas"}, any ? "Continuar: estação "+ST[next].num : "Ver as trilhas")),
       h("div", {class:"stats"}, stat(ORDER.length, "estações com explorador interativo"), stat(totalProbs(), "problemas com dicas, do básico ao olímpico"), stat(EX.length, "projetos prontos para construir"), stat("R$ 0", "para todo mundo, sempre")))));
+  add(adcMarquee());
   add(cityBlock());
   add(nomeSection());
   add(myProjects());
   add(projectGallery());
   add(h("section", {class:"sec"}, secHead("Como funciona", "Fale. A IA escreve. O celular roda.", "Toda automação do mundo, de um forno de pizzaria a um robô industrial, faz as mesmas quatro coisas. Aqui você faz as quatro no primeiro dia."),
-    h("div", {class:"loop"}, [["Sentir","o sensor mede o mundo","ler(\"som\")"],["Decidir","o código compara com um limite","if (nivel > 70)"],["Agir","o celular alerta, apita, vibra","alerta(\"Barulho!\")"],["Avisar","o registro guarda hora e local","registrar(\"evento\")"]].map(([b,s,c])=>h("div", {}, h("b", {}, b), h("span", {}, s), h("code", {}, c))))));
+    h("div", {class:"loop adc-loop"}, [["Sentir","o sensor mede o mundo","ler(\"som\")"],["Decidir","o código compara com um limite","if (nivel > 70)"],["Agir","o celular alerta, apita, vibra","alerta(\"Barulho!\")"],["Avisar","o registro guarda hora e local","registrar(\"evento\")"]].map(([b,s,c])=>h("div", {}, h("b", {}, b), h("span", {}, s), h("code", {}, c))))));
   const doneN = ORDER.filter(id=>stProgress(id).done).length;
   add(h("section", {class:"sec"}, secHead("Trilhas", "Seis linhas que se encontram na Oficina", "Lógica primeiro, porque é ela que deixa você calcular, programar, competir e conferir a IA. Cada estação tem um explorador para mexer, problemas com dicas e o pensador que criou a ideia.", h("a", {class:"btn ghost", href:"#trilhas"}, doneN ? doneN+" de "+ORDER.length+" feitas · ver mapa" : "Ver o mapa completo")), metroMap()));
   add(h("section", {class:"sec"}, h("div", {class:"oly-hero"}, h("p", {class:"eyebrow", style:"color:#ffd666"}, "Espírito olímpico"), h("p", {class:"big", html:"Olimpíada não é para gênio. <em>É para quem treina.</em>"}),
@@ -6365,7 +6576,6 @@ function renderHome(){
     h("div", {class:"row"}, h("a", {class:"btn sinal", href:"#simulado"}, "Simulado relâmpago: 5 problemas, 10 minutos"), h("a", {class:"btn ghost", href:"#olimpiadas", style:"color:#fff;border-color:#fff"}, "Calendário das olimpíadas")))));
   add(whoSection());
   add(h("section", {class:"sec"}, secHead("Pensadores", "Toda ideia daqui tem dono, data e lugar", "De Aristóteles a Turing, de Ada Lovelace a Newton da Costa, de Santos Dumont a Artur Avila. A linha do tempo termina num nome que ainda não está escrito.", h("a", {class:"btn ghost", href:"#pensadores"}, "Ver a linha do tempo")), chainEl()));
-  add(cmpSection());
   add(booksSection());
   add(apoieBand());
   add(h("section", {class:"sec"}, h("div", {class:"card stack"}, h("p", {class:"eyebrow"}, "Fundamentos"), h("h3", {}, "Por que este método funciona, com bibliografia"), h("p", {class:"small"}, "Pensar em voz alta, trabalhar em dupla, exemplo resolvido, ciência cidadã e os benchmarks no Brasil e no mundo. Tudo com referência."), h("a", {class:"btn sm ghost", href:"#fundamentos", style:"align-self:flex-start"}, "Ler os fundamentos"))));
@@ -6465,7 +6675,7 @@ function renderFund(){
       ["Trabalhar em dupla","Programação em pares: conclusão de curso de 92,4% contra 75,9% e qualidade de programa de 86,6% contra 68,1% (McDowell et al., SIGCSE 2002). Revisão em <i>Computer Science Education</i>, 2011."],
       ["IA que entrega e explica","Efeito do exemplo resolvido (Sweller e Cooper, 1985; teoria da carga cognitiva): para iniciantes, estudar uma solução completa e bem explicada ensina mais do que tentar sozinho no escuro. Por isso a IA da Oficina entrega o programa pronto e explica em poucas linhas, e as dicas dos problemas são opcionais. IA com orientação estruturada também superou a programação em pares num quase-experimento com 80 universitários (ICDEL 2025)."],
       ["Riscos da IA","Dilema da assistência: quem mais precisa usa mais e não rende mais (ACM Global Computing Education, 2024). Paradoxo da dependência (<i>Internet and Higher Education</i>, 2025). Alucinações e o aprendiz como validador (IISA 2025)."],
-      ["Problema primeiro, teoria depois","George Pólya, <i>A arte de resolver problemas</i> (1945). É também o método da Art of Problem Solving."],
+      ["Problema primeiro, teoria depois","George Pólya, <i>A arte de resolver problemas</i> (1945)."],
       ["Ciência cidadã","Estudantes inspecionando drenagem em Houston chegaram a cerca de 74% da confiabilidade de inspetores, com 30 minutos de treino (<i>Journal of Infrastructure Systems</i>, 2019). Avaliação de aprendizagem: Jordan, Ballard e Phillips, <i>Frontiers in Ecology</i>, 2012."]
     ], ["Parte do método","Base"]),
     h("div", {class:"warn small"}, h("b", {}, "Uma correção importante: "), "a escolha pela voz não se apoia no “efeito da voz” da aprendizagem multimídia, que estuda a voz da máquina falando com o aluno (Craig e Schroeder, 2017). Ela se apoia no protocolo verbal: é a fala de quem aprende que importa. E como pensar em voz alta sobrecarrega iniciantes, em dupla um fala com a IA e o outro executa, trocando de papel.")));
@@ -6473,9 +6683,8 @@ function renderFund(){
     h("ol", {class:"steps"}, ["Educação maker tem poucos estudos quantitativos: uma revisão sistemática (JRTE, 2019) achou um único estudo com melhora estatisticamente significativa.","A combinação de pares com IA ainda não foi avaliada: os estudos comparam uma contra a outra.","Formato ultracurto não foi testado: as oficinas com Arduino documentadas duram 8 horas ou 16 semanas. Uma sessão de 40 minutos a 3 horas é território novo, e é tratada como pergunta em aberto."].map(t=>h("li", {}, h("div", {}, t))))));
   add(h("section", {class:"stack"}, h("h3", {}, "Benchmarks"),
     tbl([
-      ["Art of Problem Solving (EUA)","Livros, cursos online, comunidade e treino olímpico. Inspiração direta: problema primeiro, campus virtual e uma ponte para as olimpíadas."],
       ["Portal da OBMEP (IMPA)","Videoaulas e exercícios gratuitos em português. Excelente, mas não termina com o aluno construindo uma tecnologia."],
-      ["Livros O'Reilly","Referência em tecnologia para profissionais. O Laboratório quer ser essa referência para quem começa, em português."],
+      ["Livros O'Reilly","Referência em tecnologia para profissionais. A Arte de Construir quer ser essa referência para quem começa, em português."],
       ["phyphox (RWTH Aachen)","Transforma os sensores do celular em laboratório de física. Prova que o celular é um instrumento científico."],
       ["FloodCitiSense (Bruxelas, Birmingham, Roterdã)","Alerta de enchente com sensores de baixo custo e dados de cidadãos, com código aberto."],
       ["RISE (Fiji e Indonésia)","Ciência cidadã de enchentes em assentamentos informais."],
@@ -6489,7 +6698,7 @@ function renderFund(){
     h("p", {}, "O gargalo não é medir. É a relação entre quem mede e quem vive o problema. Por isso, aqui, quem escolhe o problema é a pessoa, não o pesquisador, e o que ela constrói fica com ela.")));
   add(h("section", {class:"stack"}, h("h3", {}, "Como medimos e o que não afirmamos"),
     h("ul", {class:"deep"}, [["Antes e depois","As mesmas 6 perguntas em escala de 1 a 5, com teste de Wilcoxon pareado no Painel do pesquisador."],["Contribuição, não atribuição","Escrevemos “o projeto contribuiu para”, nunca “o projeto causou”. Amostra pequena e sem grupo de controle."],["Ética","Sem nome e sem identificação. Pela Resolução CNS 510/2016, pesquisas de opinião com participantes não identificados podem dispensar registro; gravações identificadas e menores de idade exigem submissão ao comitê de ética."],["Autorrelato é frágil","Por isso a Oficina registra o que a pessoa fez: versões do programa, erros corrigidos e a explicação com as próprias palavras."]].map(([t,d])=>h("li", {}, h("b", {}, t), h("span", {}, d))))));
-  add(h("section", {class:"card stack"}, h("h3", {}, "O que mudou com a internet"), h("p", {}, "O método foi desenhado para rodadas presenciais de duplas. Agora ele é um link: qualquer pessoa, em qualquer lugar, faz sozinha ou em grupo. O foco continua brasileiro, mas o público não tem mais limite. O horizonte é o da Art of Problem Solving: campus virtual, livros e e-books abertos, incentivo forte às olimpíadas, e parcerias para certificação."), h("a", {class:"btn sm", href:"#lab", style:"align-self:flex-start"}, "Testar o método agora")));
+  add(h("section", {class:"card stack"}, h("h3", {}, "O que mudou com a internet"), h("p", {}, "O método foi desenhado para rodadas presenciais de duplas. Agora ele é um link: qualquer pessoa, em qualquer lugar, faz sozinha ou em grupo. O foco continua brasileiro, mas o público não tem mais limite. O horizonte: campus virtual, livros e e-books abertos, incentivo forte às olimpíadas, e parcerias para certificação."), h("a", {class:"btn sm", href:"#lab", style:"align-self:flex-start"}, "Testar o método agora")));
 }
 
 /* ---------- Apoie ---------- */
@@ -6498,7 +6707,7 @@ function renderApoie(){
   add(h("section", {class:"stack"}, h("h3", {}, "Para onde vai cada real"),
     h("ul", {class:"deep"}, [["Plataforma no ar","Servidor, domínio próprio e manutenção, para o link nunca cair."],["Kits para escolas públicas","Placa ESP32, sensores e cabos para levar a versão física às salas de aula. A referência de custo é de R$ 105 a R$ 185 por dupla."],["Monitores e professores","Bolsas para quem conduz rodadas em escolas, Naves do Conhecimento e associações."],["Conteúdo aberto","A coleção de livros Arte de Construir, novas trilhas de física e química e mais IA, com livros e e-books gratuitos."]].map(([t,d])=>h("li", {}, h("b", {}, t), h("span", {}, d))))));
   add(h("section", {class:"stack"}, h("h3", {}, "Outras formas de ajudar agora"),
-    h("ol", {class:"steps"}, ["Use com a sua turma, o seu filho ou a sua equipe, e mande o resultado.","Construa um projeto e coloque a página dele no seu LinkedIn: cada projeto publicado mostra que a escola funciona.","Escolas, empresas e instituições que queiram levar o Laboratório para uma rede, ou certificar quem conclui as trilhas: procurem o autor pelo currículo Lattes, no rodapé."].map(t=>h("li", {}, h("div", {}, t))))));
+    h("ol", {class:"steps"}, ["Use com a sua turma, o seu filho ou a sua equipe, e mande o resultado.","Construa um projeto e coloque a página dele no seu LinkedIn: cada projeto publicado mostra que a escola funciona.","Escolas, empresas e instituições que queiram levar a Arte de Construir para uma rede, ou certificar quem conclui as trilhas: procurem o autor pelo currículo Lattes, no rodapé."].map(t=>h("li", {}, h("div", {}, t))))));
   add(booksSection());
 }
 
